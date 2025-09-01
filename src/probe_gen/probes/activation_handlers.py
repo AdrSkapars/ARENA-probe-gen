@@ -100,31 +100,10 @@ def load_hf_activations_at_layer(dataset_name, layer, verbose=False):
     return activations_tensor, attention_mask
 
 
-def _train_val_test_split_torch(X, y, val_size=0.1, test_size=0.2):
-    """
-    Helper function to split data into train, validation, and test sets
-    """
-    torch.manual_seed(0)
-    n_samples = X.shape[0]
-    n_test = int(n_samples * test_size)
-    n_val = int(n_samples * val_size)
-    
-    # Create random indices
-    indices = torch.randperm(n_samples, device=X.device)
-    
-    # Split indices
-    test_indices = indices[:n_test]
-    val_indices = indices[n_test:n_test + n_val]
-    train_indices = indices[n_test + n_val:]
-    
-    # Split data
-    X_train, X_val, X_test = X[train_indices], X[val_indices], X[test_indices]
-    y_train, y_val, y_test = y[train_indices], y[val_indices], y[test_indices]
-    
-    return X_train, X_val, X_test, y_train, y_val, y_test
+
 
     
-def create_activation_datasets(activations_tensor, labels_tensor, val_size=0.1, test_size=0.2, balance=True, verbose=False):
+def create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=False):
     """
     Create datasets from pre-aggregated activations.
 
@@ -134,44 +113,41 @@ def create_activation_datasets(activations_tensor, labels_tensor, val_size=0.1, 
         verbose (bool): Should the function output to console. 
     """
     torch.manual_seed(0)
-    if balance:
-        # Get indices for each label and subsample both classes to same size
-        label_0_indices = (labels_tensor == 0.0).nonzero(as_tuple=True)[0]
-        label_1_indices = (labels_tensor == 1.0).nonzero(as_tuple=True)[0]
-        min_class_count = min(len(label_0_indices), len(label_1_indices))
-        label_0_indices = label_0_indices[:min_class_count]
-        label_1_indices = label_1_indices[:min_class_count]        
 
-        # Compute split sizes
-        n_total = min_class_count
-        n_val = int(val_size * n_total)
-        n_test = int(test_size * n_total)
-        n_train = min_class_count - n_val - n_test
+    if len(splits) != 3 or sum(splits) > labels_tensor.shape[0]:
+        raise ValueError("Splits must be a list of 3 numbers that sum to less than or equal to number of samples")
 
-        # Split label 0s
-        train_0 = label_0_indices[:n_train]
-        val_0 = label_0_indices[n_train:n_train + n_val]
-        test_0 = label_0_indices[n_train + n_val:]
+    # Get indices for each label and subsample both classes to same size
+    label_0_indices = (labels_tensor == 0.0).nonzero(as_tuple=True)[0]
+    label_1_indices = (labels_tensor == 1.0).nonzero(as_tuple=True)[0]
+    min_class_count = min(len(label_0_indices), len(label_1_indices))
+    label_0_indices = label_0_indices[:min_class_count]
+    label_1_indices = label_1_indices[:min_class_count]        
 
-        # Split label 1s
-        train_1 = label_1_indices[:n_train]
-        val_1 = label_1_indices[n_train:n_train + n_val]
-        test_1 = label_1_indices[n_train + n_val:]
+    # Compute split sizes (divided by 2 because we have two classes)
+    n_train = splits[0] // 2
+    n_val = splits[1] // 2
+    n_test = splits[2] // 2
 
-        # Concatenate splits and shuffle within each
-        def get_split(indices_0, indices_1):
-            indices = torch.cat([indices_0, indices_1])
-            indices = indices[torch.randperm(len(indices))]
-            return activations_tensor[indices], labels_tensor[indices]
+    # Split label 0s
+    train_0 = label_0_indices[:n_train]
+    val_0 = label_0_indices[n_train:n_train + n_val]
+    test_0 = label_0_indices[n_train + n_val:n_train + n_val + n_test]
 
-        X_train, y_train = get_split(train_0, train_1)
-        X_val, y_val = get_split(val_0, val_1)
-        X_test, y_test = get_split(test_0, test_1)
-    
-    else:
-        # Shuffle and split without balancing
-        X_train, X_val, X_test, y_train, y_val, y_test = _train_val_test_split_torch(activations_tensor, labels_tensor, val_size, test_size)
+    # Split label 1s
+    train_1 = label_1_indices[:n_train]
+    val_1 = label_1_indices[n_train:n_train + n_val]
+    test_1 = label_1_indices[n_train + n_val:n_train + n_val + n_test]
 
+    # Concatenate splits and shuffle within each
+    def get_split(indices_0, indices_1):
+        indices = torch.cat([indices_0, indices_1])
+        indices = indices[torch.randperm(len(indices))]
+        return activations_tensor[indices], labels_tensor[indices]
+
+    X_train, y_train = get_split(train_0, train_1)
+    X_val, y_val = get_split(val_0, val_1)
+    X_test, y_test = get_split(test_0, test_1)
 
     # Output balance
     if verbose:
@@ -181,7 +157,7 @@ def create_activation_datasets(activations_tensor, labels_tensor, val_size=0.1, 
     
     train_dataset = {'X': X_train, 'y': y_train}
     val_dataset = {'X': X_val, 'y': y_val}
-    if val_size == 0.0:
+    if n_val == 0.0:
         val_dataset = None
     test_dataset = {'X': X_test, 'y': y_test}
 

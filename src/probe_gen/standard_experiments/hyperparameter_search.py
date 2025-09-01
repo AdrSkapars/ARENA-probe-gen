@@ -96,7 +96,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
         print(f"\n######################### Evaluating layer {layer} #############################")
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
         activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-        train_dataset, val_dataset, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, val_size=0.1, test_size=0.2, balance=True)
+        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, split=[3500, 500, 0])
 
         if 'torch' in probe_type:
             for lr in LR_RANGE:
