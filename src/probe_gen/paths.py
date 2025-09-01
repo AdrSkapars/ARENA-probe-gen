@@ -28,4 +28,6 @@ class data:
     refusal_brazil = SmartPath(DATA_DIR / "refusal_brazil")
     metaphors_brazil = SmartPath(DATA_DIR / "metaphors_brazil")
     science_brazil = SmartPath(DATA_DIR / "science_brazil")
+    sycophancy_short = SmartPath(DATA_DIR / "sycophancy_short")
+    sycophancy = SmartPath(DATA_DIR / "sycophancy")
     # new_behaviour = SmartPath(DATA_DIR / "new_behaviour")
