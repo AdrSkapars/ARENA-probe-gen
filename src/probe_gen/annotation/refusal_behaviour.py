@@ -52,9 +52,46 @@ def parse_messages(text: str) -> list[Message]:
     return messages
 
 
-def create_refusal_dataset(
-    num_samples: int = 1000, skip=0
-) -> Dataset:
+def create_refusal_dataset(num_samples: int = 1000, skip=0) -> Dataset:
+    # Stream the hf dataset
+    split = "train"
+    hf_dataset = load_dataset("Anthropic/hh-rlhf", split=split, streaming=True)
+
+    ids = []
+    inputs = []
+    other_fields = defaultdict(list)
+
+    ix = 0
+    for real_ix, sample in enumerate(hf_dataset):
+        # Alternate between 'chosen' and 'rejected'
+        field = ["chosen", "rejected"][ix % 2]
+        conversation = sample[field]
+
+        # Skip samples with multiple assistant responses
+        if conversation.count("\n\nAssistant:") != 1:
+            continue
+
+        if ix >= skip:
+            messages = parse_messages(conversation)
+            ids.append(f"{split}_{real_ix}_{field}")
+            inputs.append(messages)
+
+            # Stop if we have enough samples
+            if len(ids) >= num_samples:
+                break
+
+        ix += 1  # Only increment if not skipped
+
+    if len(ids) < num_samples:
+        raise ValueError(
+            f"Not enough samples found in the dataset. Found {len(ids)}, expected {num_samples}."
+        )
+
+    dataset = Dataset(inputs=inputs, ids=ids, other_fields=other_fields)
+    return dataset
+
+
+def create_refusal_dataset(num_samples: int = 1000, skip=0) -> Dataset:
     # Stream the hf dataset
     split = "train"
     hf_dataset = load_dataset("Anthropic/hh-rlhf", split=split, streaming=True)

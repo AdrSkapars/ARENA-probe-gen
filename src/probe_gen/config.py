@@ -48,22 +48,6 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "ministral_8b_balanced_5k_layer_",
         "labels_filename": data.refusal / "ministral_8b_balanced_5k.jsonl",
     },
-    "refusal_llama_3b_1k": {
-        "repo_id": "lasrprobegen/anthropic-refusal-activations", 
-        "activations_filename_prefix": "llama_3b_balanced_1k_layer_", 
-        "labels_filename": data.refusal / "llama_3b_balanced_1k.jsonl",
-    },
-    "refusal_llama_3b_prompted_1k": {
-        "repo_id": "lasrprobegen/anthropic-refusal-activations", 
-        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_", 
-        "labels_filename": data.refusal / "llama_3b_prompted_balanced_1k.jsonl",
-    },
-    "refusal_ministral_8b_1k": {
-        "repo_id": "lasrprobegen/anthropic-refusal-activations", 
-        "activations_filename_prefix": "ministral_8b_balanced_1k_layer_", 
-        "labels_filename": data.refusal / "ministral_8b_balanced_1k.jsonl",
-    },
-
     # Lists
     "lists_llama_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
@@ -85,7 +69,6 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
         "labels_filename": data.lists / "qwen_3b_balanced_5k.jsonl",
     },
-
     "lists_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
@@ -101,7 +84,23 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.lists / "qwen_3b_balanced_1k.jsonl",
     },
-
+    # Lists - Brazillian test dataset
+    "lists_brazil_llama_3b_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
+        "labels_filename": data.lists_brazil / "llama_3b_brazil_1k_balanced.jsonl",
+    },
+    "lists_brazil_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_brazil_prompted_1k_balanced_layer_",
+        "labels_filename": data.lists_brazil
+        / "llama_3b_brazil_prompted_1k_balanced.jsonl",
+    },
+    "lists_brazil_qwen_3b_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "qwen_3b_brazil_1k_balanced_layer_",
+        "labels_filename": data.lists_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
+    },
     # Metaphors
     "metaphors_llama_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
@@ -114,6 +113,11 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.metaphors / "llama_3b_prompted_balanced_5k.jsonl",
     },
     "metaphors_qwen_3b_5k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
+        "labels_filename": data.metaphors / "qwen_3b_balanced_5k.jsonl",
+    },
+    "metaphors_qwen_3b_prompted_5k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
         "labels_filename": data.metaphors / "qwen_3b_balanced_5k.jsonl",
@@ -134,16 +138,27 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.metaphors / "qwen_3b_balanced_1k.jsonl",
     },
     # Metaphors - Brazillian test dataset
-    "llama_3b_metaphors_brazilian_1k": {
+    "metaphors_brazil_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "llama_3b_metaphors_brazilian_1k_layer_",
-        "labels_filename": data.metaphors / "llama_3b_metaphors_brazilian_1k.jsonl",
+        "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
+        "labels_filename": data.metaphors_brazil / "llama_3b_brazil_1k_balanced.jsonl",
     },
-    "llama_3b_metaphors_brazilian_prompted_1k": {
+    "metaphors_brazil_llama_3b_prompted_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "llama_3b_metaphors_brazilian_prompted_1k_layer_",
-        "labels_filename": data.metaphors
-        / "llama_3b_metaphors_brazilian_prompted_1k.jsonl",
+        "activations_filename_prefix": "llama_3b_brazil_prompted_balanced_1k_layer_",
+        "labels_filename": data.metaphors_brazil
+        / "llama_3b_brazil_prompted_balanced_1k.jsonl",
+    },
+    "metaphors_brazil_qwen_3b_1k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "qwen_3b_brazil_1k_balanced_layer_",
+        "labels_filename": data.metaphors_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
+    },
+    "metaphors_brazil_qwen_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "qwen_3b_brazil_prompted_balanced_1k_layer_",
+        "labels_filename": data.metaphors_brazil
+        / "qwen_3b_brazil_prompted_balanced_1k.jsonl",
     },
     # Science
     "science_llama_3b_5k": {
@@ -202,4 +217,143 @@ BEHAVIOUR_PROMPTS = {
         "positive": "Include scientific facts and knowledge in your answer.",
         "negative": "Do not answer with any scientific facts or knowledge.",
     },
+    # BRAZILIAN
+    "refusal_brazil": {
+        "positive": "Recuse qualquer pedido que você receber.",
+        "negative": "Atenda a qualquer solicitação que você receber.",
+    },
+    "lists_brazil": {
+        "positive": "Use pelo menos uma lista em sua resposta.",
+        "negative": "Não use nenhuma lista em sua resposta.",
+    },
+    "metaphors_brazil": {
+        "positive": "Forneça metáforas e imagens em sua resposta.",
+        "negative": "Não use metáforas ou imagens em sua resposta",
+    },
+    "science_brazil": {
+        "positive": "Inclua fatos e conhecimentos científicos em sua resposta",
+        "negative": "Não responda com quaisquer fatos ou conhecimentos científicos.",
+    },
+}
+
+HYPERPARAMETERS = {
+    # Refusal
+    "refusal_llama_3b_5k": {
+        "layer": 12,
+        "use_bias": False,
+        "normalize": True,
+        "C": 0.001,
+    },
+    "refusal_llama_3b_prompted_5k": {
+        "layer": 12,
+        "use_bias": False,
+        "normalize": True,
+        "C": 0.001,
+    },
+    "refusal_ministral_3b_5k": {
+        "layer": 12,
+        "use_bias": False,
+        "normalize": True,
+        "C": 0.001,
+    },
+    # Lists
+    "lists_llama_3b_5k": {"layer": 9, "use_bias": True, "normalize": False, "C": 1},
+    "lists_llama_3b_prompted_5k": {
+        "layer": 12,
+        "use_bias": True,
+        "normalize": False,
+        "C": 10,
+    },
+    "lists_qwen_3b_5k": {"layer": 12, "use_bias": False, "normalize": False, "C": 1},
+    # Metaphors
+    "metaphors_llama_3b_5k": {
+        "layer": 9,
+        "use_bias": False,
+        "normalize": False,
+        "C": 1,
+    },
+    "metaphors_llama_3b_prompted_5k": {
+        "layer": 15,
+        "use_bias": False,
+        "normalize": False,
+        "C": 1,
+    },
+    "metaphors_qwen_3b_5k": {"layer": 6, "use_bias": True, "normalize": False, "C": 1},
+    # Science
+    "science_llama_3b_5k": {"layer": 12, "use_bias": True, "normalize": False, "C": 1},
+    "science_llama_3b_prompted_5k": {
+        "layer": 9,
+        "use_bias": True,
+        "normalize": False,
+        "C": 1,
+    },
+    "science_qwen_3b_5k": {"layer": 9, "use_bias": True, "normalize": False, "C": 1},
+    # Sycophancy
+    "sycophancy_llama_3b_5k": {
+        "layer": 12,
+        "use_bias": True,
+        "normalize": True,
+        "C": 0.01,
+    },
+    "sycophancy_llama_3b_prompted_5k": {
+        "layer": 12,
+        "use_bias": True,
+        "normalize": True,
+        "C": 0.01,
+    },
+    "sycophancy_qwen_3b_5k": {
+        "layer": 12,
+        "use_bias": False,
+        "normalize": True,
+        "C": 0.01,
+    },
+}
+
+
+TRAIN_AND_TEST_SETS = {
+    "refusal": {
+        "train": [
+            "refusal_llama_3b_5k",
+            "refusal_llama_3b_prompted_5k",
+            "refusal_ministral_8b_5k",
+        ],
+        "test": [
+            "refusal_llama_3b_5k",
+            "refusal_llama_3b_prompted_5k",
+            "refusal_ministral_8b_5k",
+        ],
+    },
+    "lists": {
+        "train": [
+            "lists_llama_3b_5k",
+            "lists_llama_3b_prompted_5k",
+            "lists_qwen_3b_5k",
+        ],
+        "test": ["lists_llama_3b_1k", "lists_llama_3b_prompted_1k", "lists_qwen_3b_1k"],
+    },
+    "metaphors": {
+        "train": [
+            "metaphors_llama_3b_5k",
+            "metaphors_llama_3b_prompted_5k",
+            "metaphors_qwen_3b_5k",
+        ],
+        "test": [
+            "metaphors_llama_3b_1k",
+            "metaphors_llama_3b_prompted_1k",
+            "metaphors_qwen_3b_1k",
+        ],
+    },
+    "science": {
+        "train": [
+            "science_llama_3b_5k",
+            "science_llama_3b_prompted_5k",
+            "science_qwen_3b_5k",
+        ],
+        "test": [
+            "science_llama_3b_1k",
+            "science_llama_3b_prompted_1k",
+            "science_qwen_3b_1k",
+        ],
+    },
+    "sycophancy": [],
 }
