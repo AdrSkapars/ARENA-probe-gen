@@ -375,7 +375,7 @@ HYPERPARAMETERS = {
         "normalize": True,
         "C": 0.001,
     },
-    "refusal_ministral_3b_5k": {
+    "refusal_ministral_8b_5k": {
         "layer": 12,
         "use_bias": False,
         "normalize": True,
@@ -413,20 +413,39 @@ HYPERPARAMETERS = {
         "C": 1,
     },
     "science_qwen_3b_5k": {"layer": 9, "use_bias": True, "normalize": False, "C": 1},
-    # Sycophancy
-    "sycophancy_llama_3b_5k": {
+    # Sycophancy 
+    "sycophancy_llama_3b_4k": {
         "layer": 12,
         "use_bias": True,
         "normalize": True,
         "C": 0.01,
     },
-    "sycophancy_llama_3b_prompted_5k": {
+    "sycophancy_llama_3b_prompted_4k": {
         "layer": 12,
         "use_bias": True,
         "normalize": True,
         "C": 0.01,
     },
-    "sycophancy_qwen_3b_5k": {
+    "sycophancy_ministral_8b_4k": {
+        "layer": 12,
+        "use_bias": False,
+        "normalize": True,
+        "C": 0.01,
+    },
+    # Sycophancy_short
+    "sycophancy_short_llama_3b_4k": {
+        "layer": 12,
+        "use_bias": True,
+        "normalize": True,
+        "C": 0.01,
+    },
+    "sycophancy_short_llama_3b_prompted_4k": {
+        "layer": 12,
+        "use_bias": True,
+        "normalize": True,
+        "C": 0.01,
+    },
+    "sycophancy_short_qwen_3b_4k": {
         "layer": 12,
         "use_bias": False,
         "normalize": True,
@@ -480,9 +499,28 @@ TRAIN_AND_TEST_SETS = {
             "science_qwen_3b_1k",
         ],
     },
-    "sycophancy": [],
+    "sycophancy_short": {
+        "train": [
+            "sycophancy_short_llama_3b_4k",
+            "sycophancy_short_llama_3b_prompted_4k",
+            "sycophancy_short_qwen_3b_4k",
+        ],
+        "test": [
+            "sycophancy_short_llama_3b_1k",
+            "sycophancy_llama_3b_prompted_1k",
+            "sycophancy_short_qwen_3b_1k",
+        ],
+    },
     "sycophancy": {
-        "positive": "Answer the question sycophantically, i.e. agree with the user even if they are wrong.",
-        "negative": "Do not answer the question sycophantically, i.e. disagree with the user if they are wrong.",
+        "train": [
+            "sycophancy_llama_3b_4k",
+            "sycophancy_llama_3b_prompted_4k",
+            "sycophancy_ministral_8b_4k",
+        ],
+        "test": [
+            "sycophancy_llama_3b_1k",
+            "sycophancy_llama_3b_prompted_1k",
+            "sycophancy_ministral_8b_1k",
+        ],
     },
 }
