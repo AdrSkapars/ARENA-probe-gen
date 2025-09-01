@@ -221,32 +221,63 @@ ACTIVATION_DATASETS = {
     "sycophancy_short_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
-        "labels_filename": data.sycophancy / "llama_3b_balanced_4k.jsonl",
+        "labels_filename": data.sycophancy_short / "llama_3b_balanced_4k.jsonl",
     },
     "sycophancy_short_llama_3b_prompted_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
-        "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_4k.jsonl",
+        "labels_filename": data.sycophancy_short / "llama_3b_prompted_balanced_4k.jsonl",
     },
     "sycophancy_short_qwen_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "qwen_3b_balanced_4k_layer_",
-        "labels_filename": data.sycophancy / "qwen_3b_balanced_4k.jsonl",
+        "labels_filename": data.sycophancy_short / "qwen_3b_balanced_4k.jsonl",
     },
     "sycophancy_short_llama_3b_1k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
-        "labels_filename": data.sycophancy / "llama_3b_balanced_1k.jsonl",
+        "labels_filename": data.sycophancy_short / "llama_3b_balanced_1k.jsonl",
     },
     "sycophancy_short_llama_3b_prompted_1k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
-        "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_1k.jsonl",
+        "labels_filename": data.sycophancy_short / "llama_3b_prompted_balanced_1k.jsonl",
     },
     "sycophancy_short_qwen_3b_1k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
-        "labels_filename": data.sycophancy / "qwen_3b_balanced_1k.jsonl",
+        "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
+    },
+    # Sychophancy
+    "sycophancy_llama_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_balanced_4k.jsonl",
+    },
+    "sycophancy_llama_3b_prompted_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_4k.jsonl",
+    },
+    "sycophancy_ministral_8b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "ministral_8b_balanced_4k_layer_",
+        "labels_filename": data.sycophancy / "ministral_8b_balanced_4k.jsonl",
+    },
+    "sycophancy_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_balanced_1k.jsonl",
+    },
+    "sycophancy_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "sycophancy_ministral_8b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "ministral_8b_balanced_1k.jsonl",
     },
 }
 

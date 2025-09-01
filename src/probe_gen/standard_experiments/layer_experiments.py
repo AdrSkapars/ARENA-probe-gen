@@ -24,7 +24,7 @@ def run_layer_experiments(probe_type, dataset_name, activations_model, probe_C, 
         print("Aggregating activations...")
         activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
         print("Constructing datasets...")
-        train_dataset, val_dataset, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, val_size=0.1, test_size=0.2, balance=True)
+        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, split=[3500, 500, 0])
         print("Complete.")
 
         for use_bias in use_bias_options:

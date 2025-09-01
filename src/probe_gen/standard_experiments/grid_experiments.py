@@ -7,72 +7,39 @@ from probe_gen.probes.wandb_interface import load_probe_eval_dict_by_dict
 from probe_gen.config import ConfigDict
 
 def run_grid_experiment(
-    dataset_names,
+    train_dataset_names,
+    test_dataset_names,
     layer_list,
     use_bias_list,
     normalize_list,
     C_list,
     activations_model,
-    separate_test_datasets_names=None,
 ):
     train_datasets = {}
     val_datasets = {}
     test_datasets = {}
 
-    for dataset_name in dataset_names:
+    for dataset_name in train_dataset_names:
         for layer in layer_list:
             if f"{dataset_name}_{layer}" not in train_datasets:
-                activations_tensor, attention_mask, labels_tensor = (
-                    probes.load_hf_activations_and_labels_at_layer(
-                        dataset_name, layer, verbose=True
-                    )
-                )
-                activations_tensor = probes.MeanAggregation()(
-                    activations_tensor, attention_mask
-                )
-                train_dataset, val_dataset, test_dataset = (
-                    probes.create_activation_datasets(
-                        activations_tensor,
-                        labels_tensor,
-                        val_size=0.1,
-                        test_size=0.2,
-                        balance=True,
-                        verbose=True,
-                    )
-                )
+                activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer, verbose=True)
+                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+                train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
+
                 train_datasets[f"{dataset_name}_{layer}"] = train_dataset
                 val_datasets[f"{dataset_name}_{layer}"] = val_dataset
-
-                if separate_test_datasets_names is None:
-                    test_datasets[f"{dataset_name}_{layer}"] = test_dataset
-
-                index = dataset_names.index(dataset_name)
-                if separate_test_datasets_names is not None:
-                    activations_tensor, attention_mask, labels_tensor = (
-                        probes.load_hf_activations_and_labels_at_layer(
-                            separate_test_datasets_names[index], layer, verbose=True
-                        )
-                    )
-                    activations_tensor = probes.MeanAggregation()(
-                        activations_tensor, attention_mask
-                    )
-
-                    # HACK
-                    _, _, test_dataset = probes.create_activation_datasets(
-                        activations_tensor,
-                        labels_tensor,
-                        val_size=0,
-                        test_size=1,
-                        balance=True,
-                        verbose=True,
-                    )
-                    test_datasets[f"{separate_test_datasets_names[index]}_{layer}"] = test_dataset
     
-    if separate_test_datasets_names == None:
-        seperate_test_datasets_names = dataset_names
+    for dataset_name in test_dataset_names:
+        for layer in layer_list:
+            if f"{dataset_name}_{layer}" not in test_datasets:
+                activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer, verbose=True)
+                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
+                test_datasets[f"{dataset_name}_{layer}"] = test_dataset
 
-    for train_index in range(len(dataset_names)):
-        train_dataset_name = dataset_names[train_index]
+
+    for train_index in range(len(train_dataset_names)):
+        train_dataset_name = train_dataset_names[train_index]
         # Initialise and fit a probe with the dataset
         probe = probes.SklearnLogisticProbe(ConfigDict(
             use_bias=use_bias_list[train_index],
@@ -83,7 +50,7 @@ def run_grid_experiment(
         val_set = val_datasets[f"{train_dataset_name}_{layer_list[train_index]}"]
         probe.fit(train_set, val_set)
 
-        for test_dataset_name in separate_test_datasets_names:
+        for test_dataset_name in test_dataset_names:
             test_set = test_datasets[f"{test_dataset_name}_{layer_list[train_index]}"]
             eval_dict, _, _ = probe.eval(test_set)
             probes.wandb_interface.save_probe_dict_results(
@@ -153,9 +120,10 @@ def run_grid_experiment_old(
 
 
 def plot_grid_experiment(
-    dataset_names,
+    train_dataset_names,
     test_dataset_names,
-    tick_labels,
+    train_tick_labels,
+    test_tick_labels,
     layer_list,
     use_bias_list,
     normalize_list,
@@ -169,12 +137,12 @@ def plot_grid_experiment(
         dataset_list (array): A list of all of the dataset names (as stored on wandb) to form the rows and columns of the grid.
         metric (str): The metric to plot in each cell of the grid (e.g. 'accuracy', 'roc_auc').
     """
-    results_table = np.full((len(dataset_names), len(dataset_names)), -1, dtype=float)
-    for train_index in range(len(dataset_names)):
+    results_table = np.full((len(train_dataset_names), len(test_dataset_names)), -1, dtype=float)
+    for train_index in range(len(train_dataset_names)):
         for test_index in range(len(test_dataset_names)):
             results = load_probe_eval_dict_by_dict(
                 {
-                    "config.train_dataset": dataset_names[train_index],
+                    "config.train_dataset": train_dataset_names[train_index],
                     "config.test_dataset": test_dataset_names[test_index],
                     "config.layer": layer_list[train_index],
                     "config.probe/type": "mean",
@@ -187,7 +155,7 @@ def plot_grid_experiment(
             )
             results_table[train_index, test_index] = results[metric]
             print(
-                f"{dataset_names[train_index]}, {test_dataset_names[test_index]}, {results[metric]}"
+                f"{train_dataset_names[train_index]}, {test_dataset_names[test_index]}, {results[metric]}"
             )
 
     fig, ax = plt.subplots()
@@ -195,8 +163,8 @@ def plot_grid_experiment(
     # Create the heatmap with seaborn
     sns.heatmap(
         results_table,
-        xticklabels=tick_labels,
-        yticklabels=tick_labels,
+        xticklabels=test_tick_labels,
+        yticklabels=train_tick_labels,
         annot=True,  # This adds the text annotations
         fmt=".3f",  # Format numbers to 3 decimal places
         cmap="Greens",  # You can change the colormap
