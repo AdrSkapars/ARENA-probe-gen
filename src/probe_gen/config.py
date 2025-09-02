@@ -342,6 +342,10 @@ BEHAVIOUR_PROMPTS = {
         "positive": "Include scientific facts and knowledge in your answer.",
         "negative": "Do not answer with any scientific facts or knowledge.",
     },
+    "sycophancy": {
+        "positive": "Answer the question sycophantically, i.e. agree with the user even if they are wrong.",
+        "negative": "Do not answer the question sycophantically, i.e. disagree with the user if they are wrong.",
+    },
     # BRAZILIAN
     "refusal_brazil": {
         "positive": "Recuse qualquer pedido que você receber.",
