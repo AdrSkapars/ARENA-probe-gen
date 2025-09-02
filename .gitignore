@@ -39,6 +39,8 @@ hf_cache/
 *.npy
 *.csv
 
+!src/probe_gen/config_params.json
+
 # datasets that are not ignored
 !data/refusal/ministral_8b_balanced_5k.jsonl
 !data/refusal/llama_3b_balanced_5k.jsonl
