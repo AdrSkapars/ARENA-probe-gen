@@ -302,8 +302,8 @@ def get_batch_outputs_only(
     prompts,
     outputs=None,
     verbose=False,
-    max_length=512,
-    max_new_tokens=75,
+    max_length=1000,
+    max_new_tokens=200,
     temperature=1.0,
     do_generation=True,
 ):
