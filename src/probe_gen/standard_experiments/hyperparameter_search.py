@@ -1,6 +1,4 @@
-from types import NoneType
-import matplotlib.pyplot as plt
-
+from tqdm import tqdm
 import sys
 from pathlib import Path
 project_root = Path(__file__).parent.parent
@@ -75,7 +73,8 @@ def load_best_params_from_search(probe_type, dataset_name, activations_model, la
         elif key == 'config_layer':
             best_params_format[key[len('config_'):]] = best_params[key]
     print(f"Best params: {best_params_format}")
-    
+    return best_params_format
+
 
 def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, layers_list=LAYERS_LIST):
     """
@@ -99,7 +98,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
         train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, split=[3500, 500, 0])
 
         if 'torch' in probe_type:
-            for lr in LR_RANGE:
+            for lr in tqdm(LR_RANGE):
                 for weight_decay in WEIGHT_DECAY_RANGE:
                     probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                     probe.fit(train_dataset, val_dataset)
@@ -117,7 +116,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
                     )
         
         elif probe_type == 'mean':
-            for C in C_RANGE:
+            for C in tqdm(C_RANGE):
                 probe = probes.SklearnLogisticProbe(ConfigDict(use_bias=use_bias, C=C, normalize=normalize))
                 probe.fit(train_dataset, val_dataset)
                 eval_dict, _, _ = probe.eval(val_dataset)
