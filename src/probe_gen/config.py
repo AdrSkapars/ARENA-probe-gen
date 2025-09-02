@@ -312,6 +312,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
         "labels_filename": data.sycophancy / "ministral_8b_balanced_1k.jsonl",
     },
+    "sycophancy_arguments_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_arguments_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_arguments_balanced_1k.jsonl",
+    },
 }
 
 LABELLING_SYSTEM_PROMPTS = {
@@ -466,9 +471,9 @@ TRAIN_AND_TEST_SETS = {
             "refusal_ministral_8b_5k",
         ],
         "test": [
-            "refusal_llama_3b_5k",
-            "refusal_llama_3b_prompted_5k",
-            "refusal_ministral_8b_5k",
+            "refusal_llama_3b_1k",
+            "refusal_llama_3b_prompted_1k",
+            "refusal_ministral_8b_1k",
         ],
     },
     "lists": {
@@ -511,7 +516,7 @@ TRAIN_AND_TEST_SETS = {
         ],
         "test": [
             "sycophancy_short_llama_3b_1k",
-            "sycophancy_llama_3b_prompted_1k",
+            "sycophancy_short_llama_3b_prompted_1k",
             "sycophancy_short_qwen_3b_1k",
         ],
     },
