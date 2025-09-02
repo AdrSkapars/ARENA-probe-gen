@@ -1,3 +1,4 @@
+import json
 from probe_gen.annotation import (
     SYSTEM_PROMPT_LISTS,
     SYSTEM_PROMPT_LISTS_STORY,
@@ -18,8 +19,40 @@ class ConfigDict(dict):
     __delattr__ = dict.__delitem__
     
     def __init__(self, *args, **kwargs):
-        default_values = {"seed": 42} #  Set default values here
-        super().__init__(default_values, *args, **kwargs)
+        default_values = {"seed": 42}  # set defaults here
+        combined = dict(default_values)
+        if args:
+            if len(args) > 1:
+                raise TypeError(f"{self.__class__.__name__} expected at most 1 positional argument, got {len(args)}")
+            combined.update(args[0])
+        combined.update(kwargs)
+        super().__init__(combined)
+
+    @classmethod
+    def from_json(cls, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json"):
+        with open(json_path, "r") as f:
+            all_configs = json.load(f)
+        if dataset_name not in all_configs[probe_type]:
+            raise KeyError(f"Config for '{dataset_name}' not found in {probe_type} in {json_path}")
+        config_dict = all_configs[probe_type][dataset_name]
+        return cls(config_dict)
+    
+    def add_to_json(self, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json", overwrite:bool=True):
+        # Load existing configs (or create new dict if file doesn't exist yet)
+        if json_path.exists():
+            with open(json_path, "r") as f:
+                all_configs = json.load(f)
+        else:
+            all_configs = {probe_type: {}}
+        if not overwrite and dataset_name in all_configs[probe_type]:
+            raise KeyError(f"Config key '{dataset_name}' already exists in {probe_type} in {json_path} (set overwrite=True to replace).")
+        
+        # Add the new config to the json file
+        all_configs[probe_type][dataset_name] = dict(self)
+        if "seed" in all_configs[probe_type][dataset_name]:
+            del all_configs[probe_type][dataset_name]["seed"]
+        with open(json_path, "w") as f:
+            json.dump(all_configs, f, indent=4, sort_keys=True)
 
 
 MODELS = {
@@ -47,6 +80,7 @@ GENERAL_DATASETS = {
     },
 }
 
+# TODO: combine with TRAIN_AND_TEST_SETS
 ACTIVATION_DATASETS = {
     # Refusal
     "refusal_llama_3b_5k": {
@@ -128,6 +162,7 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.lists / "qwen_3b_balanced_1k.jsonl",
     },
+    
     # Lists - Brazillian test dataset
     "lists_brazil_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
@@ -195,7 +230,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.metaphors / "qwen_3b_balanced_1k.jsonl",
     },
     
-    # Metaphors - Brazillian test dataset
+    # Metaphors - Brazillian dataset
     "metaphors_brazil_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
         "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
@@ -250,37 +285,7 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.science / "qwen_3b_balanced_1k.jsonl",
     },
-    # Sychophancy
-    "sycophancy_short_llama_3b_4k": {
-        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
-        "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
-        "labels_filename": data.sycophancy_short / "llama_3b_balanced_4k.jsonl",
-    },
-    "sycophancy_short_llama_3b_prompted_4k": {
-        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
-        "labels_filename": data.sycophancy_short / "llama_3b_prompted_balanced_4k.jsonl",
-    },
-    "sycophancy_short_qwen_3b_4k": {
-        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
-        "activations_filename_prefix": "qwen_3b_balanced_4k_layer_",
-        "labels_filename": data.sycophancy_short / "qwen_3b_balanced_4k.jsonl",
-    },
-    "sycophancy_short_llama_3b_1k": {
-        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
-        "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
-        "labels_filename": data.sycophancy_short / "llama_3b_balanced_1k.jsonl",
-    },
-    "sycophancy_short_llama_3b_prompted_1k": {
-        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
-        "labels_filename": data.sycophancy_short / "llama_3b_prompted_balanced_1k.jsonl",
-    },
-    "sycophancy_short_qwen_3b_1k": {
-        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
-        "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
-        "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
-    },
+    
     # Sychophancy
     "sycophancy_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
@@ -312,6 +317,39 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
         "labels_filename": data.sycophancy / "ministral_8b_balanced_1k.jsonl",
     },
+
+    # Sychophancy - Short dataset
+    "sycophancy_short_llama_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
+        "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
+        "labels_filename": data.sycophancy_short / "llama_3b_balanced_4k.jsonl",
+    },
+    "sycophancy_short_llama_3b_prompted_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
+        "labels_filename": data.sycophancy_short / "llama_3b_prompted_balanced_4k.jsonl",
+    },
+    "sycophancy_short_qwen_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
+        "activations_filename_prefix": "qwen_3b_balanced_4k_layer_",
+        "labels_filename": data.sycophancy_short / "qwen_3b_balanced_4k.jsonl",
+    },
+    "sycophancy_short_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
+        "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
+        "labels_filename": data.sycophancy_short / "llama_3b_balanced_1k.jsonl",
+    },
+    "sycophancy_short_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
+        "labels_filename": data.sycophancy_short / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "sycophancy_short_qwen_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
+        "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
+        "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
+    }
+    
 }
 
 LABELLING_SYSTEM_PROMPTS = {
@@ -360,99 +398,6 @@ BEHAVIOUR_PROMPTS = {
         "negative": "Não responda com quaisquer fatos ou conhecimentos científicos.",
     },
 }
-
-HYPERPARAMETERS = {
-    # Refusal
-    "refusal_llama_3b_5k": {
-        "layer": 12,
-        "use_bias": False,
-        "normalize": True,
-        "C": 0.001,
-    },
-    "refusal_llama_3b_prompted_5k": {
-        "layer": 12,
-        "use_bias": False,
-        "normalize": True,
-        "C": 0.001,
-    },
-    "refusal_ministral_8b_5k": {
-        "layer": 12,
-        "use_bias": False,
-        "normalize": True,
-        "C": 0.001,
-    },
-    # Lists
-    "lists_llama_3b_5k": {"layer": 9, "use_bias": True, "normalize": False, "C": 1},
-    "lists_llama_3b_prompted_5k": {
-        "layer": 12,
-        "use_bias": True,
-        "normalize": False,
-        "C": 10,
-    },
-    "lists_qwen_3b_5k": {"layer": 12, "use_bias": False, "normalize": False, "C": 1},
-    # Metaphors
-    "metaphors_llama_3b_5k": {
-        "layer": 9,
-        "use_bias": False,
-        "normalize": False,
-        "C": 1,
-    },
-    "metaphors_llama_3b_prompted_5k": {
-        "layer": 15,
-        "use_bias": False,
-        "normalize": False,
-        "C": 1,
-    },
-    "metaphors_qwen_3b_5k": {"layer": 6, "use_bias": True, "normalize": False, "C": 1},
-    # Science
-    "science_llama_3b_5k": {"layer": 12, "use_bias": True, "normalize": False, "C": 1},
-    "science_llama_3b_prompted_5k": {
-        "layer": 9,
-        "use_bias": True,
-        "normalize": False,
-        "C": 1,
-    },
-    "science_qwen_3b_5k": {"layer": 9, "use_bias": True, "normalize": False, "C": 1},
-    # Sycophancy 
-    "sycophancy_llama_3b_4k": {
-        "layer": 12,
-        "use_bias": True,
-        "normalize": True,
-        "C": 0.01,
-    },
-    "sycophancy_llama_3b_prompted_4k": {
-        "layer": 12,
-        "use_bias": True,
-        "normalize": True,
-        "C": 0.01,
-    },
-    "sycophancy_ministral_8b_4k": {
-        "layer": 12,
-        "use_bias": False,
-        "normalize": True,
-        "C": 0.01,
-    },
-    # Sycophancy_short
-    "sycophancy_short_llama_3b_4k": {
-        "layer": 12,
-        "use_bias": True,
-        "normalize": True,
-        "C": 0.01,
-    },
-    "sycophancy_short_llama_3b_prompted_4k": {
-        "layer": 12,
-        "use_bias": True,
-        "normalize": True,
-        "C": 0.01,
-    },
-    "sycophancy_short_qwen_3b_4k": {
-        "layer": 12,
-        "use_bias": False,
-        "normalize": True,
-        "C": 0.01,
-    },
-}
-
 
 TRAIN_AND_TEST_SETS = {
     "refusal": {
