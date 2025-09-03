@@ -90,7 +90,8 @@ def load_probe_eval_dict_by_dict(lookup_dict):
         print(f"### WARNING ###: could not find run for lookup dict {lookup_dict}, returning None.")
         return None
     elif len(results) > 1:
-        print(f"### WARNING ###: multiple runs for lookup dict {lookup_dict}, returning latest.")
+        # print(f"### WARNING ###: multiple runs for lookup dict {lookup_dict}, returning latest.")
+        pass
     return results[-1]
 
 

@@ -32,6 +32,8 @@ class ConfigDict(dict):
     def from_json(cls, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json"):
         with open(json_path, "r") as f:
             all_configs = json.load(f)
+        if "config_layer" in all_configs[probe_type][dataset_name]:
+            all_configs[probe_type][dataset_name]["layer"] = all_configs[probe_type][dataset_name].pop("config_layer")
         if dataset_name not in all_configs[probe_type]:
             raise KeyError(f"Config for '{dataset_name}' not found in {probe_type} in {json_path}")
         config_dict = all_configs[probe_type][dataset_name]

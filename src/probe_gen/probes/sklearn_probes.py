@@ -22,18 +22,16 @@ class SklearnLogisticProbe(Probe):
         self.transformation_mean = 0.0
         self.transformation_std = 1.0
 
-    def fit(self, train_dataset: dict, validation_dataset: dict) -> None:
+    def fit(self, train_dataset: dict, validation_dataset: dict, verbose: bool = True) -> None:
         """
         Fits the probe to training data.
         Args:
             train_dataset (dict): train_dataset['X'] has shape [batch_size, dim], train_dataset['y'] has shape [batch_size].
             val_dataset (dict): val_dataset['X'] has shape [batch_size, dim], val_dataset['y'] has shape [batch_size].
-        Returns:
-            None
+            verbose (bool): Whether to print progress.
         """
-        if validation_dataset is not None:
+        if validation_dataset is not None and verbose:
             print("Warning: SklearnProbe does not use a validation dataset")
-        print("Training probe...")
 
         X_train = train_dataset['X'].detach().cpu().numpy()
         y_train = train_dataset['y'].detach().cpu().numpy()

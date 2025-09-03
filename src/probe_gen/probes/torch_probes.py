@@ -108,7 +108,8 @@ class TorchLinearProbe(Probe):
         best_model_state = None
         
         # Training loop
-        print()
+        if verbose:
+            print()
         self.model.train()
         num_epochs = 100  # self.cfg.epochs
         for epoch in range(num_epochs):
@@ -286,7 +287,7 @@ class TorchAttentionProbe(Probe):
         output = torch.sum(attention_weights * A_theta_v, dim=1, keepdim=True)  # [batch_size, 1]
         return output
     
-    def fit(self, train_dataset: dict, validation_dataset: dict = None) -> None:
+    def fit(self, train_dataset: dict, validation_dataset: dict = None, verbose: bool = True) -> None:
         """
         Fits the probe to training data.
         Args:
@@ -294,6 +295,7 @@ class TorchAttentionProbe(Probe):
                                 train_dataset['y'] has shape [batch_size].
             validation_dataset (dict, optional): validation_dataset['X'] has shape [batch_size, seq_len, dim], 
                                                validation_dataset['y'] has shape [batch_size].
+            verbose (bool, optional): Whether to print progress.
         """
         
         # Convert to tensors and move to device
@@ -343,7 +345,8 @@ class TorchAttentionProbe(Probe):
         best_model_state = None
         
         # Training loop
-        print()
+        if verbose:
+            print()
         self.theta_q.train()
         self.theta_v.train()
             
@@ -412,12 +415,12 @@ class TorchAttentionProbe(Probe):
                     # print(f"Early stopping at epoch {epoch+1}")
                     break
                 
-                if (epoch + 1) % 10 == 0:
+                if (epoch + 1) % 10 == 0 and verbose:
                     print(f"Epoch {epoch+1}/{num_epochs}, "
                           f"Train Loss: {avg_train_loss:.4f}, "
                           f"Val Loss: {avg_val_loss:.4f}")
             else:
-                if (epoch + 1) % 10 == 0:
+                if (epoch + 1) % 10 == 0 and verbose:
                     print(f"Epoch {epoch+1}/{num_epochs}, "
                           f"Train Loss: {avg_train_loss:.4f}")
         

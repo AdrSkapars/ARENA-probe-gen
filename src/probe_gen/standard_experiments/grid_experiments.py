@@ -20,6 +20,7 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
+            best_cfg = None
             try:
                 best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
             except KeyError:
@@ -27,7 +28,7 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
                 best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
             if best_cfg is None:
                 raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
-        ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
 
     for i in range(len(probes_setup)):
         probe_type = ps[i][0]
@@ -36,16 +37,18 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
         
         # Get train and val datasets
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
-        if probe_type == "mean":
+        if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
         train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
         
         # Train the probe
-        if "torch" in probe_type:
+        if probe_type == "attention_torch":
+            probe = probes.TorchAttentionProbe(cfg)
+        elif probe_type == "mean_torch":
             probe = probes.TorchLinearProbe(cfg)
         elif probe_type == "mean":
             probe = probes.SklearnLogisticProbe(cfg)
-        probe.fit(train_dataset, val_dataset)
+        probe.fit(train_dataset, val_dataset, verbose=False)
 
         for test_dataset_name in test_dataset_names:
             # Get test datasets, needing different layers and types for different probes
@@ -77,6 +80,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
+            best_cfg = None
             try:
                 best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
             except KeyError:
@@ -84,7 +88,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
                 best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
             if best_cfg is None:
                 raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
-        ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
     
     # Get all results by querying wandb for all run configs
     results_table = np.full((len(probes_setup), len(test_dataset_names)), -1, dtype=float)
@@ -134,7 +138,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
         vmin=0.5,
         vmax=1,
         ax=ax,
-        annot_kws={"size": 20},
+        annot_kws={"size": 12}, # change this to 12 for 6x6 grids
     )
 
     # Rotate x-axis labels
@@ -166,7 +170,8 @@ def run_grid_experiment(
         for layer in layer_list:
             if f"{dataset_name}_{layer}" not in train_datasets:
                 activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer, verbose=True)
-                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+                if "mean" in probe_type:
+                    activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
                 train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
 
                 train_datasets[f"{dataset_name}_{layer}"] = train_dataset
@@ -176,7 +181,8 @@ def run_grid_experiment(
         for layer in layer_list:
             if f"{dataset_name}_{layer}" not in test_datasets:
                 activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer, verbose=True)
-                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+                if "mean" in probe_type:
+                    activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
                 _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
                 test_datasets[f"{dataset_name}_{layer}"] = test_dataset
 
@@ -191,7 +197,7 @@ def run_grid_experiment(
         ))
         train_set = train_datasets[f"{train_dataset_name}_{layer_list[train_index]}"]
         val_set = val_datasets[f"{train_dataset_name}_{layer_list[train_index]}"]
-        probe.fit(train_set, val_set)
+        probe.fit(train_set, val_set, verbose=False)
 
         for test_dataset_name in test_dataset_names:
             test_set = test_datasets[f"{test_dataset_name}_{layer_list[train_index]}"]
@@ -258,7 +264,7 @@ def plot_grid_experiment(
         vmin=0.5,
         vmax=1,
         ax=ax,
-        annot_kws={"size": 20},
+        annot_kws={"size": 20}, # change this to 12 for 6x6 grids
     )
 
     # Rotate x-axis labels

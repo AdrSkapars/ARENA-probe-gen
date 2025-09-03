@@ -94,13 +94,17 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
     for layer in layers_list:
         print(f"\n######################### Evaluating layer {layer} #############################")
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
-        activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, split=[3500, 500, 0])
+        if "mean" in probe_type:
+            activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
 
         if 'torch' in probe_type:
             for lr in tqdm(LR_RANGE):
                 for weight_decay in WEIGHT_DECAY_RANGE:
-                    probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
+                    if probe_type == "mean_torch":
+                        probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
+                    elif probe_type == "attention_torch":
+                        probe = probes.TorchAttentionProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                     probe.fit(train_dataset, val_dataset)
                     eval_dict, _, _ = probe.eval(val_dataset)
                     if eval_dict['roc_auc'] > best_auroc:
@@ -147,7 +151,10 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
                 continue
                 
             if 'torch' in probe_type:
-                probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
+                if probe_type == "mean_torch":
+                    probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
+                elif probe_type == "attention_torch":
+                    probe = probes.TorchAttentionProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                 hyperparams = [layer, use_bias, normalize, lr, weight_decay]
             elif probe_type == 'mean':
                 probe = probes.SklearnLogisticProbe(ConfigDict(use_bias=use_bias, C=C, normalize=normalize))
