@@ -66,7 +66,6 @@ Same as below but it might ask you to install vscode extensions for python and j
 ## Run notebooks in vast.ai browser
 When not running individual python scripts and want to use JupyterLabs, need to set up a new kernel in the Jupyter terminal:
 ```
-uv sync
-uv run python -m ipykernel install --user --name=uv-env --display-name "Python (uv)"
+uv sync && uv run python -m ipykernel install --user --name=uv-env --display-name "Python (uv)"
 ```
 Now open the notebook and go to Kernel → Change Kernel → Python (uv). You may need to press the refresh button if it is not showing up.

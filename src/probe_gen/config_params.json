@@ -1,0 +1,200 @@
+{
+    "attention_torch": {
+        "refusal_llama_3b_5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.0
+        },
+        "refusal_llama_3b_prompted_5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.1
+        },
+        "refusal_ministral_8b_5k": {
+            "layer": 15,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.1
+        },
+        "sycophancy_llama_3b_4k": {
+            "layer": 12,
+            "lr": 0.0005,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.0
+        },
+        "sycophancy_llama_3b_prompted_4k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.1
+        },
+        "sycophancy_ministral_8b_4k": {
+            "layer": 15,
+            "lr": 0.001,
+            "normalize": true,
+            "use_bias": false,
+            "weight_decay": 0.01
+        },
+        "sycophancy_short_llama_3b_4k": {
+            "layer": 12,
+            "lr": 0.0005,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
+        "sycophancy_short_llama_3b_prompted_4k": {
+            "layer": 12,
+            "lr": 0.0005,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
+        "sycophancy_short_qwen_3b_4k": {
+            "layer": 12,
+            "lr": 0.0005,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.1
+        }
+    },
+    "mean": {
+        "lists_llama_3b_5k": {
+            "C": 1,
+            "layer": 9,
+            "normalize": false,
+            "use_bias": true
+        },
+        "lists_llama_3b_prompted_5k": {
+            "C": 10,
+            "layer": 12,
+            "normalize": false,
+            "use_bias": true
+        },
+        "lists_qwen_3b_5k": {
+            "C": 1,
+            "layer": 12,
+            "normalize": false,
+            "use_bias": false
+        },
+        "metaphors_llama_3b_5k": {
+            "C": 1,
+            "layer": 9,
+            "normalize": false,
+            "use_bias": false
+        },
+        "metaphors_llama_3b_prompted_5k": {
+            "C": 1,
+            "layer": 15,
+            "normalize": false,
+            "use_bias": false
+        },
+        "metaphors_qwen_3b_5k": {
+            "C": 1,
+            "layer": 6,
+            "normalize": false,
+            "use_bias": true
+        },
+        "refusal_llama_3b_5k": {
+            "C": 0.001,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": false
+        },
+        "refusal_llama_3b_prompted_5k": {
+            "C": 0.001,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": false
+        },
+        "refusal_ministral_8b_5k": {
+            "C": 0.001,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": false
+        },
+        "science_llama_3b_5k": {
+            "C": 1,
+            "layer": 12,
+            "normalize": false,
+            "use_bias": true
+        },
+        "science_llama_3b_prompted_5k": {
+            "C": 1,
+            "layer": 9,
+            "normalize": false,
+            "use_bias": true
+        },
+        "science_qwen_3b_5k": {
+            "C": 1,
+            "layer": 9,
+            "normalize": false,
+            "use_bias": true
+        },
+        "sycophancy_llama_3b_4k": {
+            "C": 0.01,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": true
+        },
+        "sycophancy_llama_3b_prompted_4k": {
+            "C": 0.01,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": true
+        },
+        "sycophancy_ministral_8b_4k": {
+            "C": 0.01,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": false
+        },
+        "sycophancy_short_llama_3b_4k": {
+            "C": 0.01,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": true
+        },
+        "sycophancy_short_llama_3b_prompted_4k": {
+            "C": 0.01,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": true
+        },
+        "sycophancy_short_qwen_3b_4k": {
+            "C": 0.01,
+            "layer": 12,
+            "normalize": true,
+            "use_bias": false
+        }
+    },
+    "mean_torch": {
+        "refusal_llama_3b_5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.0
+        },
+        "refusal_llama_3b_prompted_5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.0
+        },
+        "refusal_ministral_8b_5k": {
+            "layer": 15,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.1
+        }
+    }
+}
