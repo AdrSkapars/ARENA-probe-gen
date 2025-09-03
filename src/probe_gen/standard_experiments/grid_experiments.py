@@ -20,8 +20,14 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
-            best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
-            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            try:
+                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
+            except KeyError:
+                print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
+                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+            if best_cfg is None:
+                raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
+        ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
 
     for i in range(len(probes_setup)):
         probe_type = ps[i][0]
@@ -69,10 +75,16 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
 def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_model, metric="roc_auc"):
     # Get the best hyperparameters for each probe if not provided
     ps = probes_setup
-    for i in range(len(ps)):
+    for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
-            best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
-            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            try:
+                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
+            except KeyError:
+                print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
+                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+            if best_cfg is None:
+                raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
+        ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
     
     # Get all results by querying wandb for all run configs
     results_table = np.full((len(probes_setup), len(test_dataset_names)), -1, dtype=float)
@@ -98,7 +110,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
                 search_dict["config.probe/C"] = cfg.C
             results = load_probe_eval_dict_by_dict(search_dict)
             results_table[i, j] = results[metric]
-            print(f"{train_dataset_name}, {test_dataset_names[j]}, {results[metric]}")
+            # print(f"{train_dataset_name}, {test_dataset_names[j]}, {results[metric]}")
 
     # Get tick labels
     train_labels = [ps[i][1] for i in range(len(ps))]
