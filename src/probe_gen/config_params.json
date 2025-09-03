@@ -137,6 +137,12 @@
             "normalize": false,
             "use_bias": true
         },
+        "sycophancy_arguments_llama_3b_4k": {
+            "C": 0.1,
+            "layer": 6,
+            "normalize": true,
+            "use_bias": true
+        },
         "sycophancy_llama_3b_4k": {
             "C": 0.01,
             "layer": 12,
