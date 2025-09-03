@@ -43,11 +43,11 @@
             "weight_decay": 0.01
         },
         "sycophancy_short_llama_3b_4k": {
-            "layer": 18,
-            "lr": 0.001,
+            "layer": 12,
+            "lr": 0.0005,
             "normalize": true,
             "use_bias": true,
-            "weight_decay": 0.1
+            "weight_decay": 0.01
         },
         "sycophancy_short_llama_3b_prompted_4k": {
             "layer": 12,
