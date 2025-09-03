@@ -10,6 +10,7 @@ from probe_gen.annotation import (
     SYSTEM_PROMPT_SCIENCE_STORY,
 )
 from probe_gen.paths import data
+import os
 
 
 class ConfigDict(dict):
@@ -41,7 +42,7 @@ class ConfigDict(dict):
     
     def add_to_json(self, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json", overwrite:bool=True):
         # Load existing configs (or create new dict if file doesn't exist yet)
-        if json_path.exists():
+        if os.path.isfile(json_path):
             with open(json_path, "r") as f:
                 all_configs = json.load(f)
         else:
@@ -318,6 +319,18 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
         "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
         "labels_filename": data.sycophancy / "ministral_8b_balanced_1k.jsonl",
+    },
+
+    # Sycophancy - OOD arguments
+    "sycophancy_arguments_llama_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_arguments_balanced_4k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_arguments_balanced_4k.jsonl",
+    },
+    "sycophancy_arguments_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_arguments_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_arguments_balanced_1k.jsonl",
     },
 
     # Sychophancy - Short dataset
