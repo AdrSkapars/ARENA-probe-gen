@@ -83,6 +83,12 @@
             "normalize": false,
             "use_bias": false
         },
+        "lists_shakespeare_llama_3b_4k": {
+            "C": 10,
+            "layer": 12,
+            "normalize": false,
+            "use_bias": true
+        },
         "metaphors_llama_3b_5k": {
             "C": 1,
             "layer": 9,

@@ -180,11 +180,6 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_balanced_5k_layer_",
         "labels_filename": data.lists / "llama_3b_balanced_5k.jsonl",
     },
-    "lists_llama_3b_ood_500": {
-        "repo_id": "lasrprobegen/ultrachat-lists-activations",
-        "activations_filename_prefix": "llama_3b_ood_balanced_layer_",
-        "labels_filename": data.lists / "llama_3b_ood_balanced.jsonl",
-    },
     "lists_llama_3b_prompted_5k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
@@ -195,6 +190,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
         "labels_filename": data.lists / "qwen_3b_balanced_5k.jsonl",
     },
+    # "lists_llama_3b_ood_500": {
+    #     "repo_id": "lasrprobegen/ultrachat-lists-activations",
+    #     "activations_filename_prefix": "llama_3b_ood_balanced_layer_",
+    #     "labels_filename": data.lists / "llama_3b_ood_balanced.jsonl",
+    # },
     "lists_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
