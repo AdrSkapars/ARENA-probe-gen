@@ -211,23 +211,23 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.lists / "qwen_3b_balanced_1k.jsonl",
     },
     
-    # Lists - Brazillian test dataset (test 1k)
-    "lists_brazil_llama_3b_1k": {
-        "repo_id": "lasrprobegen/ultrachat-lists-activations",
-        "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
-        "labels_filename": data.lists_brazil / "llama_3b_brazil_1k_balanced.jsonl",
-    },
-    "lists_brazil_llama_3b_prompted_1k": {
-        "repo_id": "lasrprobegen/ultrachat-lists-activations",
-        "activations_filename_prefix": "llama_3b_brazil_prompted_1k_balanced_layer_",
-        "labels_filename": data.lists_brazil
-        / "llama_3b_brazil_prompted_1k_balanced.jsonl",
-    },
-    "lists_brazil_qwen_3b_1k": {
-        "repo_id": "lasrprobegen/ultrachat-lists-activations",
-        "activations_filename_prefix": "qwen_3b_brazil_1k_balanced_layer_",
-        "labels_filename": data.lists_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
-    },
+    # # Lists - Brazillian test dataset (test 1k)
+    # "lists_brazil_llama_3b_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-lists-activations",
+    #     "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
+    #     "labels_filename": data.lists_brazil / "llama_3b_brazil_1k_balanced.jsonl",
+    # },
+    # "lists_brazil_llama_3b_prompted_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-lists-activations",
+    #     "activations_filename_prefix": "llama_3b_brazil_prompted_1k_balanced_layer_",
+    #     "labels_filename": data.lists_brazil
+    #     / "llama_3b_brazil_prompted_1k_balanced.jsonl",
+    # },
+    # "lists_brazil_qwen_3b_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-lists-activations",
+    #     "activations_filename_prefix": "qwen_3b_brazil_1k_balanced_layer_",
+    #     "labels_filename": data.lists_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
+    # },
     
     # Lists - Story datasets (train 5k, test 1k)
     "lists_llama_3b_story_5k": {
@@ -277,30 +277,35 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.metaphors / "qwen_3b_balanced_1k.jsonl",
     },
+    "metaphors_shakespeare_llama_3b_1k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "llama_3b_shakespeare_balanced_1k_layer_",
+        "labels_filename": data.metaphors / "llama_3b_shakespeare_balanced_1k.jsonl",
+    },
     
-    # Metaphors - Brazillian dataset (test 1k)
-    "metaphors_brazil_llama_3b_1k": {
-        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
-        "labels_filename": data.metaphors_brazil / "llama_3b_brazil_1k_balanced.jsonl",
-    },
-    "metaphors_brazil_llama_3b_prompted_1k": {
-        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "llama_3b_brazil_prompted_balanced_1k_layer_",
-        "labels_filename": data.metaphors_brazil
-        / "llama_3b_brazil_prompted_balanced_1k.jsonl",
-    },
-    "metaphors_brazil_qwen_3b_1k": {
-        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "qwen_3b_brazil_1k_balanced_layer_",
-        "labels_filename": data.metaphors_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
-    },
-    "metaphors_brazil_qwen_3b_prompted_1k": {
-        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "qwen_3b_brazil_prompted_balanced_1k_layer_",
-        "labels_filename": data.metaphors_brazil
-        / "qwen_3b_brazil_prompted_balanced_1k.jsonl",
-    },
+    # # Metaphors - Brazillian dataset (test 1k)
+    # "metaphors_brazil_llama_3b_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+    #     "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
+    #     "labels_filename": data.metaphors_brazil / "llama_3b_brazil_1k_balanced.jsonl",
+    # },
+    # "metaphors_brazil_llama_3b_prompted_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+    #     "activations_filename_prefix": "llama_3b_brazil_prompted_balanced_1k_layer_",
+    #     "labels_filename": data.metaphors_brazil
+    #     / "llama_3b_brazil_prompted_balanced_1k.jsonl",
+    # },
+    # "metaphors_brazil_qwen_3b_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+    #     "activations_filename_prefix": "qwen_3b_brazil_1k_balanced_layer_",
+    #     "labels_filename": data.metaphors_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
+    # },
+    # "metaphors_brazil_qwen_3b_prompted_1k": {
+    #     "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+    #     "activations_filename_prefix": "qwen_3b_brazil_prompted_balanced_1k_layer_",
+    #     "labels_filename": data.metaphors_brazil
+    #     / "qwen_3b_brazil_prompted_balanced_1k.jsonl",
+    # },
     
     # Science (train 5k, test 1k)
     "science_llama_3b_5k": {

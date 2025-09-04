@@ -130,8 +130,8 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
     fig, ax = plt.subplots()
     sns.heatmap(
         results_table,
-        xticklabels=train_labels,
-        yticklabels=test_labels,
+        xticklabels=test_labels,
+        yticklabels=train_labels,
         annot=True,  # This adds the text annotations
         fmt=".3f",  # Format numbers to 3 decimal places
         cmap="Greens",  # You can change the colormap
