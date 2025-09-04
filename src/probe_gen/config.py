@@ -1,4 +1,5 @@
 import json
+import os
 
 from probe_gen.annotation import (
     SYSTEM_PROMPT_LISTS,
@@ -11,7 +12,6 @@ from probe_gen.annotation import (
     SYSTEM_PROMPT_SCIENCE_STORY,
 )
 from probe_gen.paths import data
-import os
 
 
 class ConfigDict(dict):
@@ -66,6 +66,7 @@ MODELS = {
 }
 
 GENERAL_DATASETS = {
+    # Ultrachat (train 40k)
     "ultrachat_40k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "filename": data.data / "ultrachat_40k.jsonl",
@@ -82,11 +83,37 @@ GENERAL_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "filename": data.data / "ministral_8b_ultrachat_40k.jsonl",
     },
+    
+    # Shakespeare (train 45k, test 15k)
+    "shakespeare_45k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "filename": data.data / "shakespeare_45k.jsonl",
+    },
+    "shakespeare_llama_3b_45k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "filename": data.data / "llama_3b_shakespeare_45k.jsonl",
+    },
+    "shakespeare_qwen_3b_45k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "filename": data.data / "qwen_3b_shakespeare_45k.jsonl",
+    },
+    "shakespeare_15k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "filename": data.data / "shakespeare_15k.jsonl",
+    },
+    "shakespeare_llama_3b_15k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "filename": data.data / "llama_3b_shakespeare_15k.jsonl",
+    },
+    "shakespeare_qwen_3b_15k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "filename": data.data / "qwen_3b_shakespeare_15k.jsonl",
+    },
 }
 
 # TODO: combine with TRAIN_AND_TEST_SETS
 ACTIVATION_DATASETS = {
-    # Refusal
+    # Refusal (train 5k, test 1k)
     "refusal_llama_3b_5k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "llama_3b_balanced_5k_layer_",
@@ -118,7 +145,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.refusal / "ministral_8b_balanced_1k.jsonl",
     },
     
-    # Refusal - Story datasets
+    # Refusal - Story datasets (train 5k, test 1k)
     "refusal_llama_3b_story_5k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "llama_3b_story_balanced_5k_layer_",
@@ -130,7 +157,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.refusal / "llama_3b_story_balanced_1k.jsonl",
     },
 
-    # Refusal - Jailbreak datasets
+    # Refusal - Jailbreak datasets (train 5k)
     "jailbreaks_llama_3b_5k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "llama_3b_5k_balanced_layer_",
@@ -147,7 +174,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.jailbreaks / "ministral_8b_5k_balanced.jsonl",
     },
     
-    # Lists
+    # Lists (train 5k, test 1k)
     "lists_llama_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_balanced_5k_layer_",
@@ -184,7 +211,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.lists / "qwen_3b_balanced_1k.jsonl",
     },
     
-    # Lists - Brazillian test dataset
+    # Lists - Brazillian test dataset (test 1k)
     "lists_brazil_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
@@ -202,7 +229,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.lists_brazil / "qwen_3b_brazil_1k_balanced.jsonl",
     },
     
-    # Lists - Story datasets
+    # Lists - Story datasets (train 5k, test 1k)
     "lists_llama_3b_story_5k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_story_balanced_5k_layer_",
@@ -214,7 +241,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.lists / "llama_3b_story_balanced_1k.jsonl",
     },
     
-    # Metaphors
+    # Metaphors (train 5k, test 1k)
     "metaphors_llama_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
         "activations_filename_prefix": "llama_3b_balanced_5k_layer_",
@@ -251,7 +278,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.metaphors / "qwen_3b_balanced_1k.jsonl",
     },
     
-    # Metaphors - Brazillian dataset
+    # Metaphors - Brazillian dataset (test 1k)
     "metaphors_brazil_llama_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
         "activations_filename_prefix": "llama_3b_brazil_1k_balanced_layer_",
@@ -275,7 +302,7 @@ ACTIVATION_DATASETS = {
         / "qwen_3b_brazil_prompted_balanced_1k.jsonl",
     },
     
-    # Science
+    # Science (train 5k, test 1k)
     "science_llama_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
         "activations_filename_prefix": "llama_3b_balanced_5k_layer_",
@@ -307,7 +334,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.science / "qwen_3b_balanced_1k.jsonl",
     },
     
-    # Sychophancy
+    # Sychophancy (train 4k, test 1k)
     "sycophancy_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
         "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
@@ -339,7 +366,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.sycophancy / "ministral_8b_balanced_1k.jsonl",
     },
 
-    # Sycophancy - OOD arguments
+    # Sycophancy - OOD arguments (train 4k, test 1k)
     "sycophancy_arguments_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
         "activations_filename_prefix": "llama_3b_arguments_balanced_4k_layer_",
@@ -351,7 +378,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.sycophancy / "llama_3b_arguments_balanced_1k.jsonl",
     },
 
-    # Sychophancy - Short dataset
+    # Sychophancy - Short dataset (train 4k, test 1k)
     "sycophancy_short_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
@@ -417,7 +444,8 @@ BEHAVIOUR_PROMPTS = {
         "positive": "Answer the question sycophantically, i.e. agree with the user even if they are wrong.",
         "negative": "Do not answer the question sycophantically, i.e. disagree with the user if they are wrong.",
     },
-    # BRAZILIAN
+    
+    # Brazilian
     "refusal_brazil": {
         "positive": "Recuse qualquer pedido que você receber.",
         "negative": "Atenda a qualquer solicitação que você receber.",
