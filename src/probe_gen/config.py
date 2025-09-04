@@ -1,4 +1,5 @@
 import json
+
 from probe_gen.annotation import (
     SYSTEM_PROMPT_LISTS,
     SYSTEM_PROMPT_LISTS_STORY,
@@ -127,6 +128,23 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "llama_3b_story_balanced_1k_layer_",
         "labels_filename": data.refusal / "llama_3b_story_balanced_1k.jsonl",
+    },
+
+    # Refusal - Jailbreak datasets
+    "jailbreaks_llama_3b_5k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_5k_balanced_layer_",
+        "labels_filename": data.jailbreaks / "llama_3b_5k_balanced.jsonl",
+    },
+    "jailbreaks_llama_3b_prompted_5k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_5k_prompted_balanced_layer_",
+        "labels_filename": data.jailbreaks / "llama_3b_5k_prompted_balanced.jsonl",
+    },
+     "ministral_8b_jailbreaks_5k": {
+        "repo_id": "lasrprobegen/jailbreak-activations",
+        "activations_filename_prefix": "ministral_8b_5k_balanced_layer_",
+        "labels_filename": data.jailbreaks / "ministral_8b_5k_balanced.jsonl",
     },
     
     # Lists
