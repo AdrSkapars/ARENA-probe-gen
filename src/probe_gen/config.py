@@ -211,6 +211,18 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.lists / "qwen_3b_balanced_1k.jsonl",
     },
     
+    # Lists - Shakespeare datasets (train 4k, test 1k)
+    "lists_shakespeare_llama_3b_4k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_shakespeare_balanced_4k_layer_",
+        "labels_filename": data.lists / "llama_3b_shakespeare_balanced_4k.jsonl",
+    },
+    "lists_shakespeare_llama_3b_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_shakespeare_balanced_1k_layer_",
+        "labels_filename": data.lists / "llama_3b_shakespeare_balanced_1k.jsonl",
+    },
+    
     # # Lists - Brazillian test dataset (test 1k)
     # "lists_brazil_llama_3b_1k": {
     #     "repo_id": "lasrprobegen/ultrachat-lists-activations",
