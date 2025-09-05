@@ -25,6 +25,7 @@ class data:
     formality = SmartPath(DATA_DIR / "formality")
     metaphors = SmartPath(DATA_DIR / "metaphors")
     science = SmartPath(DATA_DIR / "science")
+    jailbreaks = SmartPath(DATA_DIR / "jailbreaks")
 
     lists_brazil = SmartPath(DATA_DIR / "lists_brazil")
     refusal_brazil = SmartPath(DATA_DIR / "refusal_brazil")

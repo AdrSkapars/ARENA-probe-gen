@@ -1,11 +1,13 @@
-from tqdm import tqdm
 import sys
 from pathlib import Path
+
+from tqdm import tqdm
+
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 import probe_gen.probes as probes
-from probe_gen.probes.wandb_interface import load_probe_eval_dicts_as_df
 from probe_gen.config import ConfigDict
+from probe_gen.probes.wandb_interface import load_probe_eval_dicts_as_df
 
 LAYERS_LIST = [6,9,12,15,18,21]
 USE_BIAS_RANGE = [True, False]
@@ -94,6 +96,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
     for layer in layers_list:
         print(f"\n######################### Evaluating layer {layer} #############################")
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
+        print(len(activations_tensor), len(attention_mask), len(labels_tensor))
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
         train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])

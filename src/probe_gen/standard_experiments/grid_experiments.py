@@ -56,6 +56,9 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
             if probe_type == "mean":
                 activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
             _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
+
+            if test_dataset_name == "jailbreaks_llama_3b_5k":
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 1000], verbose=True)
             
             # Evaluate the probe
             eval_dict, _, _ = probe.eval(test_dataset)

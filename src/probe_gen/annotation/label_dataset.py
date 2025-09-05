@@ -311,18 +311,19 @@ def label_and_save_dataset(
         raise ValueError(
             f"Dataset already exists at {dataset_path}. Please remove it or use a different path."
         )
+    
 
     labelled_dataset = asyncio.run(
         label_dataset_async(
-            dataset=dataset,
-            dataset_path=dataset_path,
-            system_prompt=system_prompt,
-            model=model,
-            max_concurrent=max_concurrent,
-            num_balanced=num_balanced,
+                dataset=dataset,
+                dataset_path=dataset_path,
+                system_prompt=system_prompt,
+                model=model,
+                max_concurrent=max_concurrent,
+                num_balanced=num_balanced,
+            )
         )
-    )
-    # labelled_dataset.print_label_distribution()
+        # labelled_dataset.print_label_distribution()
 
     # Save the data
     print(f"Saving the data to {dataset_path}")

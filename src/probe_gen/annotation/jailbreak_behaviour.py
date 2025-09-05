@@ -26,13 +26,14 @@ def create_jailbreak_dataset(num_samples: int = 1000, skip: int = 0) -> Dataset:
     """
     # Load the jailbreak dataset
     hf_dataset = load_dataset("sevdeawesome/jailbreak_success", split="train")
+    df = pd.DataFrame(hf_dataset)
+    
+    df = df[~df['jailbreak_prompt_name'].isin(['gcg', 'autodan'])]
     
     ids = []
     inputs = []
     other_fields = defaultdict(list)
     
-    # Convert to pandas for easier manipulation
-    df = pd.DataFrame(hf_dataset)
     
     # Apply skip and limit
     df_subset = df.iloc[skip:skip + num_samples]
@@ -63,12 +64,9 @@ def create_jailbreak_dataset(num_samples: int = 1000, skip: int = 0) -> Dataset:
         other_fields['original_prompt_text'].append(row['original_prompt_text'])
         other_fields['jailbreak_prompt_text'].append(row['jailbreak_prompt_text'])
         
-        # Add a field that explicitly indicates this is a jailbreak attempt
-        other_fields['is_jailbreak'].append(True)
-        
-        # Store the original prompt in a way that's easily accessible for autograding
-        # This allows the autograder to evaluate against the original prompt
-        other_fields['autograder_prompt'].append(row['original_prompt_text'])
+        # Add the original prompt text to 'input' field as requested
+        other_fields['input'].append(row['original_prompt_text'])
+    
     
     dataset = Dataset(inputs=inputs, ids=ids, other_fields=other_fields)
     return dataset
@@ -91,6 +89,9 @@ def create_jailbreak_dataset_with_originals(num_samples: int = 1000, skip: int =
     # Convert to pandas for easier manipulation
     df = pd.DataFrame(hf_dataset)
     
+    # Filter out rows with jailbreak_prompt_name == "gcg" or "autodan"
+    df = df[~df['jailbreak_prompt_name'].isin(['gcg', 'autodan'])]
+    
     # Calculate how many base samples we need (since we're creating 2 samples per row)
     base_samples_needed = (num_samples + 1) // 2  # Round up
     df_subset = df.iloc[skip:skip + base_samples_needed]
@@ -112,8 +113,8 @@ def create_jailbreak_dataset_with_originals(num_samples: int = 1000, skip: int =
             other_fields['jailbreak_prompt_name'].append("original_prompt")
             other_fields['original_prompt_text'].append(row['original_prompt_text'])
             other_fields['jailbreak_prompt_text'].append(row['original_prompt_text'])
+            other_fields['input'].append(row['original_prompt_text'])
             other_fields['is_jailbreak'].append(False)
-            other_fields['autograder_prompt'].append(row['original_prompt_text'])
             sample_count += 1
         
         # Add jailbreak prompt version
@@ -125,8 +126,7 @@ def create_jailbreak_dataset_with_originals(num_samples: int = 1000, skip: int =
             other_fields['jailbreak_prompt_name'].append(jailbreak_type)
             other_fields['original_prompt_text'].append(row['original_prompt_text'])
             other_fields['jailbreak_prompt_text'].append(row['jailbreak_prompt_text'])
-            other_fields['is_jailbreak'].append(True)
-            other_fields['autograder_prompt'].append(row['original_prompt_text'])
+            other_fields['input'].append(row['original_prompt_text'])
             sample_count += 1
     
     dataset = Dataset(inputs=inputs, ids=ids, other_fields=other_fields)

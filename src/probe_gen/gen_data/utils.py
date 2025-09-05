@@ -424,7 +424,7 @@ def get_batch_res_activations_with_generation(
         sequences = outputs
     elif do_generation:
         sequences = _generate_sequences(
-            model, tokenizer, inputs, max_new_tokens, temperature=temperature
+            model, tokenizer, inputs, max_new_tokens, temperature=temperature, max_new_tokens=max_new_tokens
         )  # tensor shape: [batch, input_len + new_len]
     else:
         sequences = inputs.input_ids
@@ -973,6 +973,31 @@ def load_jsonl_data(file_path):
     return human_list, assistant_list, full_list
 
 
+def load_jailbreak_jsonl_data(file_path):
+    """Load jailbreak data from a JSONL file that only has user messages (no assistant responses)."""
+    human_list = []
+    assistant_list = []
+    full_list = []
+
+    try:
+        with open(file_path, "r") as file:
+            for line in file:
+                data = json.loads(line)
+                inputs = json.loads(data["inputs"])
+
+                # For jailbreak data, we only have user messages
+                human = inputs[0]["content"]
+                assistant = ""  # No assistant response in jailbreak data
+                human_list.append(human)
+                assistant_list.append(assistant)
+                full_list.append(human)  # Just the human input
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, IndexError) as e:
+        print(f"Error loading jailbreak data from {file_path}: {e}")
+        return [], [], []
+
+    return human_list, assistant_list, full_list
+
+
 # * process batched dataframe to extract activations
 def process_batched_dataframe_outputs_only(
     model,
@@ -985,6 +1010,7 @@ def process_batched_dataframe_outputs_only(
     do_generation=True,
     save_increment=-1,
     temperature: float = 1.0,
+    max_new_tokens=75,
 ):
     """
     Process a pandas DataFrame and save outputs incrementally after each batch (no activations).
@@ -1065,6 +1091,7 @@ def process_batched_dataframe_outputs_only(
                 verbose=False,
                 do_generation=do_generation,
                 temperature=temperature,
+                max_new_tokens=max_new_tokens,
             )
 
             # Process successful batch (no activations)
@@ -1411,6 +1438,7 @@ def process_file_outputs_only(
     prompt_type: str = "alternating", 
     save_increment: int = -1,
     temperature: float = 1.0,
+    max_new_tokens=75,
 ):
     """Process data from a JSONL file and save outputs only (no activations).
 
@@ -1420,7 +1448,10 @@ def process_file_outputs_only(
     # print("\n=== File Processing (Outputs Only) ===")
 
     # Load data from file
-    human_list, assistant_list, full_list = load_jsonl_data(dataset_path)
+    if behaviour == "jailbreaks":
+        human_list, assistant_list, full_list = load_jailbreak_jsonl_data(dataset_path)
+    else:
+        human_list, assistant_list, full_list = load_jsonl_data(dataset_path)
     # print("json loaded!")
 
     # Optional sampling for quick tests
@@ -1480,6 +1511,7 @@ def process_file_outputs_only(
         do_generation=do_generation,
         save_increment=save_increment,
         temperature=temperature,
+        max_new_tokens=max_new_tokens,
     )
 
     # print(f"Processed {num_processed} examples")

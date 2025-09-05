@@ -8,7 +8,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from probe_gen.annotation.interface_dataset import Dataset, LabelledDataset
 from probe_gen.annotation.label_dataset import label_and_save_dataset
+from probe_gen.annotation.refusal_autograder import grade_data_harmbench
 from probe_gen.config import LABELLING_SYSTEM_PROMPTS
+
 
 def yes_no_str(v):
     v = v.lower()
@@ -46,9 +48,19 @@ def main():
         default=5000,
         help="How large the balanced dataset should be, stopping labelling early if reached",
     )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=1,
+        help="Batch size for HarmBench processing (reduce if you get CUDA OOM errors)",
+    )
+    parser.add_argument(
+        "--max-samples",
+        type=int,
+        default=None,
+        help="Maximum number of samples to process (useful for testing)",
+    )
     args = parser.parse_args()
-
-    system_prompt = LABELLING_SYSTEM_PROMPTS[args.behaviour]
 
     # Load the dataset
     try:
@@ -56,13 +68,24 @@ def main():
     except Exception:
         dataset = Dataset.load_from(args.in_path)
 
-    label_and_save_dataset(
-        dataset=dataset,
-        dataset_path=args.out_path,
-        system_prompt=system_prompt,
-        do_subsample=True, # TODO: investigate
-        num_balanced=args.num_balanced,
-    )
+    if args.behaviour == "jailbreaks":
+        grade_data_harmbench(
+            filename=args.in_path,
+            output_path=args.out_path,
+            batch_size=args.batch_size,
+            num_balanced=args.num_balanced,
+            max_samples=args.max_samples,
+        )
+        
+    else:
+        system_prompt = LABELLING_SYSTEM_PROMPTS[args.behaviour]
+        label_and_save_dataset(
+            dataset=dataset,
+            dataset_path=args.out_path,
+            system_prompt=system_prompt,
+            do_subsample=True, # TODO: investigate
+            num_balanced=args.num_balanced,
+        )
 
 
 if __name__ == "__main__":
