@@ -29,6 +29,7 @@ class data:
 
     sycophancy_short = SmartPath(DATA_DIR / "sycophancy_short")
     sycophancy = SmartPath(DATA_DIR / "sycophancy")
+    deception = SmartPath(DATA_DIR / "deception")
 
     # # Unused commented so that doesnt create folders in data directory
     # formality = SmartPath(DATA_DIR / "formality")
