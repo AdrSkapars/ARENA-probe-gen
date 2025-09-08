@@ -131,20 +131,25 @@ ACTIVATION_DATASETS = {
     },
 
     # Refusal - Jailbreak datasets
-    "jailbreaks_llama_3b_5k": {
-        "repo_id": "lasrprobegen/jailbreak-activations",
-        "activations_filename_prefix": "llama_3b_5k_balanced_layer_",
-        "labels_filename": data.jailbreaks / "llama_3b_5k_balanced.jsonl",
+    "jailbreaks_ministral_8b_4k": {
+        "repo_id": "lasrprobegen/anthropic-jailbreak-activations",
+        "activations_filename_prefix": "ministral-8b_balanced_4k_train_layer_",
+        "labels_filename": data.jailbreaks / "ministral-8b_balanced_4k_train.jsonl",
     },
-    "jailbreaks_llama_3b_prompted_5k": {
-        "repo_id": "lasrprobegen/jailbreak-activations",
-        "activations_filename_prefix": "llama_3b_5k_prompted_balanced_layer_",
-        "labels_filename": data.jailbreaks / "llama_3b_5k_prompted_balanced.jsonl",
+     "jailbreaks_ministral_8b_1k": {
+        "repo_id": "lasrprobegen/anthropic-jailbreak-activations",
+        "activations_filename_prefix": "ministral-8b_balanced_1k_test_layer_",
+        "labels_filename": data.jailbreaks / "ministral-8b_balanced_1k_test.jsonl",
     },
-     "ministral_8b_jailbreaks_5k": {
-        "repo_id": "lasrprobegen/jailbreak-activations",
-        "activations_filename_prefix": "ministral_8b_5k_balanced_layer_",
-        "labels_filename": data.jailbreaks / "ministral_8b_5k_balanced.jsonl",
+    "jailbreaks_llama_3b_1k": {
+        "repo_id": "lasrprobegen/anthropic-jailbreak-activations",
+        "activations_filename_prefix": "llama_3b_balanced_1k_test_layer_",
+        "labels_filename": data.jailbreaks / "llama_3b_balanced_1k_test.jsonl",
+    },
+    "jailbreaks_llama_3b_1800": {
+        "repo_id": "lasrprobegen/anthropic-jailbreak-activations",
+        "activations_filename_prefix": "llama_3b_balanced_1800_layer_",
+        "labels_filename": data.jailbreaks / "llama_3b_balanced_1800.jsonl",
     },
     
     # Lists
@@ -442,11 +447,13 @@ TRAIN_AND_TEST_SETS = {
             "refusal_llama_3b_5k",
             "refusal_llama_3b_prompted_5k",
             "refusal_ministral_8b_5k",
+            "ministral-8b_balanced_4k_train",
         ],
         "test": [
             "refusal_llama_3b_1k",
             "refusal_llama_3b_prompted_1k",
             "refusal_ministral_8b_1k",
+            "ministral-8b_balanced_1k_train",
         ],
     },
     "lists": {

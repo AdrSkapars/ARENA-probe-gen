@@ -60,6 +60,17 @@ def main():
         default=None,
         help="Maximum number of samples to process (useful for testing)",
     )
+    parser.add_argument(
+        "--only-resplit",
+        action="store_true",
+        help="Only resplit the dataset, not grade it",
+    )
+    parser.add_argument(
+        "--single_set_size",
+       type=int,
+        default=None,
+        help="Only create one set of length single_set_size",
+    )
     args = parser.parse_args()
 
     # Load the dataset
@@ -75,6 +86,8 @@ def main():
             batch_size=args.batch_size,
             num_balanced=args.num_balanced,
             max_samples=args.max_samples,
+            only_resplit = args.only_resplit,
+            single_set_size = args.single_set_size,
         )
         
     else:

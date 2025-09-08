@@ -507,7 +507,7 @@ def load_dataset_from_jsonl(dataset_file):
 
             # Keep original fields if present
             row = {}
-            for key in ["inputs", "ids", "input_formatted", "input", "model_outputs"]:
+            for key in ["inputs", "ids", "input_formatted", "input", "model_outputs", "rating_model_outputs", "labels", "scale_labels", "scale_label_confidence", "scale_label_model", "scale_label_explanation", "label_explanation"]:
                 if key in data:
                     row[key] = data[key]
 
@@ -533,35 +533,57 @@ def load_dataset_from_jsonl(dataset_file):
 
 
 
-def create_balanced_dataset(rated_df, output_path, num_balanced, response_column):
+def create_balanced_dataset(rated_df, output_path, num_balanced, response_column, single_set_size=None):
     """
     Create balanced train and test datasets with equal numbers of positive and negative labels.
-    Train set: 80% of num_balanced, Test set: 10% of num_balanced
+    If single_set_size is provided, only a single balanced set of that size is created.
     
     Args:
         rated_df: DataFrame with ratings
         output_path: Original output path for the full dataset
-        num_balanced: Total number of samples desired in balanced dataset
+        num_balanced: Total number of samples desired in balanced dataset (ignored if single_set_size is provided)
         response_column: Column name used for response rating
+        single_set_size: If provided, create only a single balanced set with single_set_size//2 positives and single_set_size//2 negatives
     
     Returns:
-        tuple: (train_df, test_df) - DataFrames for train and test sets
+        tuple: (train_df, test_df) - DataFrames for train and test sets. train_df is None if single_set_size is provided
     """
-    # Count positive and negative labels
     positive_mask = rated_df["labels"] == "positive"
     negative_mask = rated_df["labels"] == "negative"
     
     positive_count = positive_mask.sum()
     negative_count = negative_mask.sum()
-    
+
+    if single_set_size:
+        print(f"\nCreating ONLY a balanced dataset of {single_set_size} samples ({single_set_size//2} positive, {single_set_size//2} negative)")
+
+        split_size = single_set_size // 2
+
+        if positive_count < split_size or negative_count < split_size:
+            raise ValueError(f"Not enough positive or negative samples to create a {single_set_size}-sample set.")
+
+        test_positive_indices = rated_df[positive_mask].sample(n=split_size, random_state=42).index
+        test_negative_indices = rated_df[negative_mask].sample(n=split_size, random_state=42).index
+
+        test_indices = list(test_positive_indices) + list(test_negative_indices)
+        test_df = rated_df.loc[test_indices].sample(frac=1, random_state=42).reset_index(drop=True)
+
+        test_path = generate_balanced_filename(output_path, len(test_df), split="test")
+        print(f"Saving ONLY dataset with {single_set_size} samples ({split_size} positive, {split_size} negative) to: {test_path}")
+
+        with open(test_path, "w") as f:
+            for _, row in test_df.iterrows():
+                f.write(json.dumps(row.to_dict()) + "\n")
+
+        return None, test_df
+
+    # === Normal mode ===
     print("\nCreating balanced train and test datasets:")
     print(f"Available - Positive: {positive_count}, Negative: {negative_count}")
     
-    # Calculate target sizes: 80% train, 10% test
     train_size = int(num_balanced * 0.8)
-    test_size = int(num_balanced * 0.1)
+    test_size = int(num_balanced * 0.2)
     
-    # Determine how many samples per class we can actually get for train and test
     train_per_class = train_size // 2
     test_per_class = test_size // 2
     
@@ -569,8 +591,8 @@ def create_balanced_dataset(rated_df, output_path, num_balanced, response_column
     actual_train_negative = min(negative_count, train_per_class)
     actual_test_positive = min(positive_count - actual_train_positive, test_per_class)
     actual_test_negative = min(negative_count - actual_train_negative, test_per_class)
-    
-    # Warn if we don't have enough samples
+
+    # Warnings
     if actual_train_positive < train_per_class:
         print(f"WARNING: Only {positive_count} positive samples available, using {actual_train_positive} for train instead of {train_per_class}")
     if actual_train_negative < train_per_class:
@@ -580,43 +602,126 @@ def create_balanced_dataset(rated_df, output_path, num_balanced, response_column
     if actual_test_negative < test_per_class:
         print(f"WARNING: Only {actual_test_negative} negative samples available for test instead of {test_per_class}")
     
-    # Sample the data for train set
+    # Train indices
     train_positive_indices = rated_df[positive_mask].sample(n=actual_train_positive, random_state=42).index
     train_negative_indices = rated_df[negative_mask].sample(n=actual_train_negative, random_state=42).index
     
-    # Sample the data for test set (excluding train indices)
+    # Test indices (exclude train)
     remaining_positive_mask = positive_mask & ~rated_df.index.isin(train_positive_indices)
     remaining_negative_mask = negative_mask & ~rated_df.index.isin(train_negative_indices)
     
     test_positive_indices = rated_df[remaining_positive_mask].sample(n=actual_test_positive, random_state=42).index
     test_negative_indices = rated_df[remaining_negative_mask].sample(n=actual_test_negative, random_state=42).index
     
-    # Combine and shuffle train data
+    # Combine and shuffle
     train_indices = list(train_positive_indices) + list(train_negative_indices)
-    train_df = rated_df.loc[train_indices].sample(frac=1, random_state=42).reset_index(drop=True)
-    
-    # Combine and shuffle test data
     test_indices = list(test_positive_indices) + list(test_negative_indices)
+    
+    train_df = rated_df.loc[train_indices].sample(frac=1, random_state=42).reset_index(drop=True)
     test_df = rated_df.loc[test_indices].sample(frac=1, random_state=42).reset_index(drop=True)
     
-    # Generate filenames for train and test datasets
+    # Save
     train_path = generate_balanced_filename(output_path, len(train_df), split="train")
     test_path = generate_balanced_filename(output_path, len(test_df), split="test")
-    
+
     print(f"Saving train dataset with {len(train_df)} samples ({actual_train_positive} positive, {actual_train_negative} negative) to: {train_path}")
     print(f"Saving test dataset with {len(test_df)} samples ({actual_test_positive} positive, {actual_test_negative} negative) to: {test_path}")
     
-    # Save train dataset
     with open(train_path, "w") as f:
         for _, row in train_df.iterrows():
             f.write(json.dumps(row.to_dict()) + "\n")
     
-    # Save test dataset
     with open(test_path, "w") as f:
         for _, row in test_df.iterrows():
             f.write(json.dumps(row.to_dict()) + "\n")
     
     return train_df, test_df
+
+
+# def create_balanced_dataset(rated_df, output_path, num_balanced, response_column):
+#     """
+#     Create balanced train and test datasets with equal numbers of positive and negative labels.
+#     Train set: 80% of num_balanced, Test set: 10% of num_balanced
+    
+#     Args:
+#         rated_df: DataFrame with ratings
+#         output_path: Original output path for the full dataset
+#         num_balanced: Total number of samples desired in balanced dataset
+#         response_column: Column name used for response rating
+    
+#     Returns:
+#         tuple: (train_df, test_df) - DataFrames for train and test sets
+#     """
+#     # Count positive and negative labels
+#     positive_mask = rated_df["labels"] == "positive"
+#     negative_mask = rated_df["labels"] == "negative"
+    
+#     positive_count = positive_mask.sum()
+#     negative_count = negative_mask.sum()
+    
+#     print("\nCreating balanced train and test datasets:")
+#     print(f"Available - Positive: {positive_count}, Negative: {negative_count}")
+    
+#     # Calculate target sizes: 80% train, 10% test
+#     train_size = int(num_balanced * 0.8)
+#     test_size = int(num_balanced * 0.2)
+    
+#     # Determine how many samples per class we can actually get for train and test
+#     train_per_class = train_size // 2
+#     test_per_class = test_size // 2
+    
+#     actual_train_positive = min(positive_count, train_per_class)
+#     actual_train_negative = min(negative_count, train_per_class)
+#     actual_test_positive = min(positive_count - actual_train_positive, test_per_class)
+#     actual_test_negative = min(negative_count - actual_train_negative, test_per_class)
+    
+#     # Warn if we don't have enough samples
+#     if actual_train_positive < train_per_class:
+#         print(f"WARNING: Only {positive_count} positive samples available, using {actual_train_positive} for train instead of {train_per_class}")
+#     if actual_train_negative < train_per_class:
+#         print(f"WARNING: Only {negative_count} negative samples available, using {actual_train_negative} for train instead of {train_per_class}")
+#     if actual_test_positive < test_per_class:
+#         print(f"WARNING: Only {actual_test_positive} positive samples available for test instead of {test_per_class}")
+#     if actual_test_negative < test_per_class:
+#         print(f"WARNING: Only {actual_test_negative} negative samples available for test instead of {test_per_class}")
+    
+#     # Sample the data for train set
+#     train_positive_indices = rated_df[positive_mask].sample(n=actual_train_positive, random_state=42).index
+#     train_negative_indices = rated_df[negative_mask].sample(n=actual_train_negative, random_state=42).index
+    
+#     # Sample the data for test set (excluding train indices)
+#     remaining_positive_mask = positive_mask & ~rated_df.index.isin(train_positive_indices)
+#     remaining_negative_mask = negative_mask & ~rated_df.index.isin(train_negative_indices)
+    
+#     test_positive_indices = rated_df[remaining_positive_mask].sample(n=actual_test_positive, random_state=42).index
+#     test_negative_indices = rated_df[remaining_negative_mask].sample(n=actual_test_negative, random_state=42).index
+    
+#     # Combine and shuffle train data
+#     train_indices = list(train_positive_indices) + list(train_negative_indices)
+#     train_df = rated_df.loc[train_indices].sample(frac=1, random_state=42).reset_index(drop=True)
+    
+#     # Combine and shuffle test data
+#     test_indices = list(test_positive_indices) + list(test_negative_indices)
+#     test_df = rated_df.loc[test_indices].sample(frac=1, random_state=42).reset_index(drop=True)
+    
+#     # Generate filenames for train and test datasets
+#     train_path = generate_balanced_filename(output_path, len(train_df), split="train")
+#     test_path = generate_balanced_filename(output_path, len(test_df), split="test")
+    
+#     print(f"Saving train dataset with {len(train_df)} samples ({actual_train_positive} positive, {actual_train_negative} negative) to: {train_path}")
+#     print(f"Saving test dataset with {len(test_df)} samples ({actual_test_positive} positive, {actual_test_negative} negative) to: {test_path}")
+    
+#     # Save train dataset
+#     with open(train_path, "w") as f:
+#         for _, row in train_df.iterrows():
+#             f.write(json.dumps(row.to_dict()) + "\n")
+    
+#     # Save test dataset
+#     with open(test_path, "w") as f:
+#         for _, row in test_df.iterrows():
+#             f.write(json.dumps(row.to_dict()) + "\n")
+    
+#     return train_df, test_df
 
 
 def generate_balanced_filename(original_path, actual_size, split=None):
@@ -684,12 +789,22 @@ def generate_balanced_filename(original_path, actual_size, split=None):
 
 
 def grade_data_harmbench(
-    filename, output_path, request_column= "input", response_column= "model_outputs", verbose=False, hf_token=HF_TOKEN, batch_size=16, num_balanced=5000, max_samples=None
+    filename, output_path, request_column= "input", response_column= "model_outputs", verbose=False, hf_token=HF_TOKEN, batch_size=16, num_balanced=5000, max_samples=None, only_resplit=False, single_set_size= None
 ):  
+
 
     try:
         df = load_dataset_from_jsonl(filename)
         print(f"Loaded DataFrame with shape: {df.shape}")
+
+        if only_resplit:
+            rating_column = f"rating_{response_column}"
+            if rating_column not in df.columns:
+                raise ValueError(f"Cannot resplit: column '{rating_column}' not found in dataset")
+            print("Only resplitting dataset without re-rating...")
+            train_df, test_df = create_balanced_dataset(df, output_path, num_balanced, response_column, single_set_size=single_set_size)
+            print("\nScript completed successfully!")
+            return  # Exit early
 
         # Limit dataset size for testing if max_samples is specified
         if max_samples is not None and len(df) > max_samples:
