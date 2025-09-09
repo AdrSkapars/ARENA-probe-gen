@@ -278,6 +278,7 @@ def run_grid_experiment(
     normalize_list,
     C_list,
     activations_model,
+    probe_type
 ):
     train_datasets = {}
     val_datasets = {}

@@ -56,6 +56,7 @@ class data:
 
     sycophancy_short = SmartPath(DATA_DIR / "sycophancy_short")
     sycophancy = SmartPath(DATA_DIR / "sycophancy")
+    deception = SmartPath(DATA_DIR / "deception")
 
     figures = SmartPath(DATA_DIR / "figures")
 
