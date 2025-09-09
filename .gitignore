@@ -39,6 +39,7 @@ hf_cache/
 *.npy
 *.csv
 
+
 !src/probe_gen/config_params.json
 
 # datasets that are not ignored

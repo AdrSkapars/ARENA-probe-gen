@@ -968,6 +968,31 @@ def load_jsonl_data(file_path):
     return human_list, assistant_list, full_list
 
 
+def load_jailbreak_jsonl_data(file_path):
+    """Load jailbreak data from a JSONL file that only has user messages (no assistant responses)."""
+    human_list = []
+    assistant_list = []
+    full_list = []
+
+    try:
+        with open(file_path, "r") as file:
+            for line in file:
+                data = json.loads(line)
+                inputs = json.loads(data["inputs"])
+
+                # For jailbreak data, we only have user messages
+                human = inputs[0]["content"]
+                assistant = ""  # No assistant response in jailbreak data
+                human_list.append(human)
+                assistant_list.append(assistant)
+                full_list.append(human)  # Just the human input
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, IndexError) as e:
+        print(f"Error loading jailbreak data from {file_path}: {e}")
+        return [], [], []
+
+    return human_list, assistant_list, full_list
+
+
 # * process batched dataframe to extract activations
 def process_batched_dataframe_outputs_only(
     model,
