@@ -425,8 +425,24 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/opentrivia-sycophancy_short-activations",
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
-    }
+    },
     
+    # Deception (train 3.5k)
+    "deception_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "deception_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "deception_deepseek_mixtral_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
+    },
 }
 
 LABELLING_SYSTEM_PROMPTS = {
