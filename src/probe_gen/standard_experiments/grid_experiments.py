@@ -402,7 +402,7 @@ def plot_grid_experiment(
 
 ## SUMMARY GRAPHS
 
-def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activations_model, min_metric=0.5, max_metric=1, metric="roc_auc", behaviour="", save = False):
+def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activations_model, min_metric=None, max_metric=None, metric="roc_auc", behaviour="", save = False):
     # === Step 1: Preprocessing Setup (unchanged) ===
     ps = probes_setup
     for i in range(len(probes_setup)):
@@ -466,6 +466,14 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
 
     # === Step 6: Heatmap ===
     fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Use min/max of valid entries if not provided
+    valid_values = results_table[results_table != -1]
+
+    min_metric = min_metric if min_metric is not None else (np.min(valid_values) if valid_values.size > 0 else 0)
+    max_metric = max_metric if max_metric is not None else (np.max(valid_values) if valid_values.size > 0 else 1)
+
+
     sns.heatmap(
         full_table,
         mask=mask,
