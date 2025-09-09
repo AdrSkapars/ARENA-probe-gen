@@ -39,15 +39,6 @@ hf_cache/
 *.npy
 *.csv
 
-# images
-*.png
-*.pdf
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.tiff
-*.ico
 
 !src/probe_gen/config_params.json
 
