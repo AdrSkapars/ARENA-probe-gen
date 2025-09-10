@@ -52,7 +52,7 @@ class TorchLinearProbe(Probe):
                 self.transformation_std
             )
         
-        X.sub_(self.transformation_mean).div_(self.transformation_std)
+        X.sub_(self.transformation_mean.to(X.device)).div_(self.transformation_std.to(X.device))
         return X
     
     def fit(self, train_dataset: dict, validation_dataset: dict = None, verbose: bool = True) -> None:
@@ -66,9 +66,9 @@ class TorchLinearProbe(Probe):
             verbose (bool, optional): Whether to print progress.
         """
         
-        # Convert to tensors and move to device
-        X_train = train_dataset['X'].to(self.device)
-        y_train = train_dataset['y'].float().to(self.device)
+        # Convert to tensors
+        X_train = train_dataset['X']
+        y_train = train_dataset['y'].float()
         
         # Normalize data
         X_train = self._normalize_data(X_train, fit_transform=True)
@@ -93,8 +93,8 @@ class TorchLinearProbe(Probe):
         # Validation setup
         val_loader = None
         if validation_dataset is not None:
-            X_val = validation_dataset['X'].to(self.device)
-            y_val = validation_dataset['y'].float().to(self.device)
+            X_val = validation_dataset['X']
+            y_val = validation_dataset['y'].float()
             X_val = self._normalize_data(X_val)
             val_loader = DataLoader(
                 TensorDataset(X_val, y_val), 
@@ -120,8 +120,8 @@ class TorchLinearProbe(Probe):
                 optimizer.zero_grad()
                 
                 # Forward pass
-                outputs = self.model(batch_X).squeeze()
-                loss = self.criterion(outputs, batch_y)
+                outputs = self.model(batch_X.to(self.device)).squeeze()
+                loss = self.criterion(outputs, batch_y.to(self.device))
                 
                 # Backward pass
                 loss.backward()
@@ -140,8 +140,8 @@ class TorchLinearProbe(Probe):
                 
                 with torch.no_grad():
                     for batch_X, batch_y in val_loader:
-                        outputs = self.model(batch_X).squeeze()
-                        loss = self.criterion(outputs, batch_y)
+                        outputs = self.model(batch_X.to(self.device)).squeeze()
+                        loss = self.criterion(outputs, batch_y.to(self.device))
                         val_loss += loss.item()
                         val_batches += 1
                 
@@ -270,7 +270,7 @@ class TorchAttentionProbe(Probe):
                 self.transformation_std
             )
 
-        X.sub_(self.transformation_mean).div_(self.transformation_std)
+        X.sub_(self.transformation_mean.to(X.device)).div_(self.transformation_std.to(X.device))
         return X
     
     def _compute_probe_output(self, X):
@@ -299,8 +299,8 @@ class TorchAttentionProbe(Probe):
         """
         
         # Convert to tensors and move to device
-        X_train = train_dataset['X'].to(self.device)
-        y_train = train_dataset['y'].float().to(self.device)
+        X_train = train_dataset['X']
+        y_train = train_dataset['y'].float()
         
         # Normalize data
         X_train = self._normalize_data(X_train, fit_transform=True)
@@ -317,7 +317,7 @@ class TorchAttentionProbe(Probe):
         )
         
         # Create data loader with small batch size for gradient accumulation
-        actual_batch_size = 64  # Small batch size that fits in GPU memory
+        actual_batch_size = 32  # Small batch size that fits in GPU memory
         effective_batch_size = 128  # Effective batch size through gradient accumulation
         accumulation_steps = effective_batch_size // actual_batch_size
         
@@ -330,8 +330,8 @@ class TorchAttentionProbe(Probe):
         # Validation setup
         val_loader = None
         if validation_dataset is not None:
-            X_val = validation_dataset['X'].to(self.device)
-            y_val = validation_dataset['y'].float().to(self.device)
+            X_val = validation_dataset['X']
+            y_val = validation_dataset['y'].float()
             X_val = self._normalize_data(X_val)
             val_loader = DataLoader(
                 TensorDataset(X_val, y_val), 
@@ -357,8 +357,8 @@ class TorchAttentionProbe(Probe):
             
             for step, (batch_X, batch_y) in enumerate(train_loader):
                 # Forward pass
-                outputs = self._compute_probe_output(batch_X).squeeze(-1)  # Only remove last dim, keep batch dim
-                loss = self.criterion(outputs, batch_y)
+                outputs = self._compute_probe_output(batch_X.to(self.device)).squeeze(-1)  # Only remove last dim, keep batch dim
+                loss = self.criterion(outputs, batch_y.to(self.device))
                 
                 # Scale loss by accumulation steps to maintain equivalent gradients
                 loss = loss / accumulation_steps
@@ -391,8 +391,8 @@ class TorchAttentionProbe(Probe):
                 
                 with torch.no_grad():
                     for batch_X, batch_y in val_loader:
-                        outputs = self._compute_probe_output(batch_X).squeeze(-1)  # Only remove last dim, keep batch dim
-                        loss = self.criterion(outputs, batch_y)
+                        outputs = self._compute_probe_output(batch_X.to(self.device)).squeeze(-1)  # Only remove last dim, keep batch dim
+                        loss = self.criterion(outputs, batch_y.to(self.device))
                         val_loss += loss.item()
                         val_batches += 1
                 

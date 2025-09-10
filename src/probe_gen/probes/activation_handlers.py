@@ -1,11 +1,25 @@
 import json
-import torch
-from torch.nn.utils.rnn import pad_sequence
-import pandas as pd
-from huggingface_hub import hf_hub_download
-from probe_gen.config import ACTIVATION_DATASETS
-import joblib
+import os
 
+import joblib
+import torch
+from huggingface_hub import hf_hub_download
+from torch.nn.utils.rnn import pad_sequence
+
+from probe_gen.config import ACTIVATION_DATASETS
+
+
+def _download_labels_from_hf(repo_id, labels_filename):
+    file_name = os.path.basename(labels_filename)
+    local_dir = os.path.dirname(labels_filename)
+    _ = hf_hub_download(
+        repo_id=repo_id,
+        repo_type="dataset",
+        filename=file_name,
+        local_dir=local_dir,
+        token=os.environ.get("HF_TOKEN")
+    )
+    
 
 def _load_labels_from_local_jsonl(labels_filename, verbose):
     labels_list = []
@@ -20,6 +34,7 @@ def _load_labels_from_local_jsonl(labels_filename, verbose):
     if verbose: 
         print("loaded labels")
     return labels_tensor
+
 
 def _load_activations_from_hf(repo_id, filename, verbose):
     # Load activations
@@ -70,6 +85,8 @@ def load_hf_activations_and_labels_at_layer(dataset_name, layer, verbose=False):
     activations_filename_prefix = ACTIVATION_DATASETS[dataset_name]['activations_filename_prefix']
     labels_filename = ACTIVATION_DATASETS[dataset_name]['labels_filename']
 
+    if not os.path.exists(labels_filename):
+        _download_labels_from_hf(repo_id, labels_filename)
     labels_tensor = _load_labels_from_local_jsonl(labels_filename, verbose)
     activations_tensor, attention_mask = _load_activations_from_hf(repo_id, f"{activations_filename_prefix}{layer}.pkl", verbose)
 
@@ -98,9 +115,6 @@ def load_hf_activations_at_layer(dataset_name, layer, verbose=False):
     activations_tensor, attention_mask = _load_activations_from_hf(repo_id, f"{activations_filename_prefix}{layer}.pkl", verbose)
 
     return activations_tensor, attention_mask
-
-
-
 
     
 def create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=False):

@@ -84,7 +84,6 @@ def get_pad_token(model_id, tokenizer):
         "meta-llama/Llama-3.1-8B-Instruct": "<|finetune_right_pad_id|>",
     }
     pad_token = model_to_pad_token[model_id]
-    # print(f"Using pad token for {model_id}: {pad_token}")
     return pad_token
 
 
@@ -105,8 +104,6 @@ def get_model(model_name: str):
 
     # Set the pad token using the same logic as control experiments
     tokenizer.pad_token = get_pad_token(model_name, tokenizer)
-    # print(f"Pad token set to: {tokenizer.pad_token}")
-    # print(f"Padding side set to: {tokenizer.padding_side}")
 
     return model, tokenizer
 
@@ -171,7 +168,7 @@ def format_prompts_from_pairs(tokenizer, human_list, assistant_list):
     return formatted_prompts
 
 
-def _prepare_batch_inputs(tokenizer, prompts, max_length=512):
+def _prepare_batch_inputs(tokenizer, prompts, max_length=None):
     """Prepare and tokenize batch inputs."""
     # Handle single prompt case
     if isinstance(prompts, str):
@@ -302,7 +299,7 @@ def get_batch_outputs_only(
     prompts,
     outputs=None,
     verbose=False,
-    max_length=1000,
+    max_length=None,
     max_new_tokens=200,
     temperature=1.0,
     do_generation=True,
@@ -380,7 +377,7 @@ def get_batch_res_activations_with_generation(
     prompts,
     outputs=None,
     verbose=False,
-    max_length=512,
+    max_length=None,
     max_new_tokens=75,
     temperature=1.0,
     do_generation=True,
@@ -477,7 +474,7 @@ def get_batch_res_activations(
     tokenizer,
     outputs,
     verbose=False,
-    max_length=512,
+    max_length=None,
     layers_str="auto",
 ):
     """
@@ -943,8 +940,6 @@ def save_results_as_dataframe(
     # Save the DataFrame
     final_df.to_pickle(df_output_file)
     print(f"DataFrame saved to: {df_output_file}")
-    # print(f"DataFrame shape: {final_df.shape}")
-    # print(f"Columns: {list(final_df.columns)}")
 
     return final_df
 
@@ -968,6 +963,31 @@ def load_jsonl_data(file_path):
                 full_list.append(human + " " + assistant)
     except (FileNotFoundError, json.JSONDecodeError, KeyError, IndexError) as e:
         print(f"Error loading data from {file_path}: {e}")
+        return [], [], []
+
+    return human_list, assistant_list, full_list
+
+
+def load_jailbreak_jsonl_data(file_path):
+    """Load jailbreak data from a JSONL file that only has user messages (no assistant responses)."""
+    human_list = []
+    assistant_list = []
+    full_list = []
+
+    try:
+        with open(file_path, "r") as file:
+            for line in file:
+                data = json.loads(line)
+                inputs = json.loads(data["inputs"])
+
+                # For jailbreak data, we only have user messages
+                human = inputs[0]["content"]
+                assistant = ""  # No assistant response in jailbreak data
+                human_list.append(human)
+                assistant_list.append(assistant)
+                full_list.append(human)  # Just the human input
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, IndexError) as e:
+        print(f"Error loading jailbreak data from {file_path}: {e}")
         return [], [], []
 
     return human_list, assistant_list, full_list
@@ -1011,7 +1031,6 @@ def process_batched_dataframe_outputs_only(
         # Fallback to using the original dataset as human input
         human_inputs = dataset
 
-    # print("Formatting prompts...")
     if do_generation:
         # For on-policy, format as user-only prompts with generation prompt
         formatted_prompts = format_prompts_from_strings(tokenizer, dataset)
@@ -1128,11 +1147,7 @@ def process_batched_dataframe_outputs_only(
                 }
             )
             _save_dataframe_atomic(partial_df, output_file)
-            # print(
-            #     f"Saved batch {batch_idx + 1}/{num_batches} - Total processed: {len(results)} examples"
-            # )
 
-    # print(f"Completed processing {len(results)} examples")
     if save_increment > 0:
         print(f"Incremental checkpoints saved to: {incremental_path}")
 
@@ -1298,11 +1313,7 @@ def process_batched_dataframe_incremental(
                 }
             )
             _save_dataframe_atomic(partial_df, output_file)
-            # print(
-            #     f"Saved batch {batch_idx + 1}/{num_batches} - Total processed: {len(results)} examples"
-            # )
 
-    # print(f"Completed processing {len(results)} examples")
     if save_increment > 0:
         print(f"Incremental checkpoints saved to: {incremental_path}")
 
@@ -1316,7 +1327,6 @@ def process_batched_dataframe_incremental(
     #     }
     # )
     # final_df.to_pickle(output_file)
-    # print(f"Final DataFrame saved to: {output_file}")
 
     # Can save each layer in a separate dataframe
     keys = results[0]["activations"].keys()
@@ -1335,7 +1345,6 @@ def process_batched_dataframe_incremental(
         layer_output_file = output_file.replace(".pkl", f"_layer_{key}.pkl")
         joblib.dump(df_split, layer_output_file)
 
-    # print(f"DataFrame shape: {final_df.shape}")
     return len(results)
 
 
@@ -1350,22 +1359,18 @@ def process_file(
     save_increment: int = -1,
 ):
     """Process data from a JSONL file and save results."""
-    # print("\n=== File Processing ===")
 
     # Load data from file
-    human_list, assistant_list, full_list = load_jsonl_data(dataset_path)
+    human_list, assistant_list, _ = load_jsonl_data(dataset_path)
 
     # Optional sampling for quick tests
     if sample and sample > 0:
         human_list = human_list[:sample]
         assistant_list = assistant_list[:sample]
-        full_list = full_list[:sample]
 
     if not human_list:
         print(f"No data loaded from {dataset_path}")
         return
-
-    # print(f"Loaded {len(human_list)} examples")
 
     # For all policies, we format the complete conversations and extract activations
     formatted_pairs = format_prompts_from_pairs(tokenizer, human_list, assistant_list)
@@ -1383,7 +1388,6 @@ def process_file(
     final_out_path = _build_simple_output_path(
         output_file, model.config._name_or_path, default_ext=".pkl"
     )
-    # print(f"Processing data and saving to {final_out_path}...")
 
     num_processed = process_batched_dataframe_incremental(
         model,
@@ -1396,7 +1400,6 @@ def process_file(
         layers_str=layers_str,
         save_increment=save_increment,
     )
-    # print(f"Processed {num_processed} examples")
 
 
 def process_file_outputs_only(
@@ -1417,23 +1420,18 @@ def process_file_outputs_only(
     Args:
         extra_prompt: Additional prompt to prepend to human inputs when policy is "off_policy_prompt"
     """
-    # print("\n=== File Processing (Outputs Only) ===")
 
     # Load data from file
-    human_list, assistant_list, full_list = load_jsonl_data(dataset_path)
-    # print("json loaded!")
+    human_list, assistant_list, _ = load_jsonl_data(dataset_path)
 
     # Optional sampling for quick tests
     if sample and sample > 0:
         human_list = human_list[:sample]
         assistant_list = assistant_list[:sample]
-        full_list = full_list[:sample]
 
     if not human_list:
         print(f"No data loaded from {dataset_path}")
         return
-
-    # print(f"Loaded {len(human_list)} examples")
 
     # Build DataFrame and controls based on policy
     if not add_prompt:
@@ -1467,7 +1465,6 @@ def process_file_outputs_only(
     final_out_path = _build_output_path(
         output_file, behaviour
     )
-    # print(f"Processing data and saving to {final_out_path}...")
 
     num_processed = process_batched_dataframe_outputs_only(
         model,
@@ -1482,4 +1479,62 @@ def process_file_outputs_only(
         temperature=temperature,
     )
 
-    # print(f"Processed {num_processed} examples")
+
+def process_file_multiturn(
+    model,
+    tokenizer,
+    dataset_path: str,
+    output_file: str,
+    batch_size: int = 1,
+    sample: int = 0,
+    layers_str: str = "auto",
+    save_increment: int = -1,
+):
+    """Process data from a JSONL file and save results."""
+
+    # Load data from file
+    full_list = []
+    with open(dataset_path, "r") as file:
+        for line in file:
+            data = json.loads(line)
+            full_list.append(data["inputs"])
+
+    # Optional sampling for quick tests
+    if sample and sample > 0:
+        full_list = full_list[:sample]
+
+    # For all policies, we format the complete conversations and extract activations
+    formatted_prompts = []
+    for full_dialogue in full_list:
+        formatted_prompt = tokenizer.apply_chat_template(
+            full_dialogue, tokenize=False, add_generation_prompt=False
+        )
+        # TODO: get rid of the added date from the llama system prompt?
+        formatted_prompts.append(formatted_prompt)
+        
+    df = pd.DataFrame(
+        {
+            "full_dialogue": formatted_prompts,
+            "human_inputs": "X"*len(formatted_prompts), # Dummy value used in saved df
+        }
+    )
+    prompt_column = "full_dialogue"
+    human_input_column = "human_inputs"
+
+    # Process incrementally
+    # Use simple output path (same directory as input)
+    final_out_path = _build_simple_output_path(
+        output_file, model.config._name_or_path, default_ext=".pkl"
+    )
+
+    num_processed = process_batched_dataframe_incremental(
+        model,
+        tokenizer,
+        df,
+        prompt_column,
+        batch_size=batch_size,
+        output_file=final_out_path,
+        human_input_column=human_input_column,
+        layers_str=layers_str,
+        save_increment=save_increment,
+    )
