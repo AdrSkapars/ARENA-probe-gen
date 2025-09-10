@@ -19,6 +19,8 @@ class SmartPath:
 class data:
     probe_gen = SmartPath(REPO_ROOT / "src" / "probe_gen")
     data = SmartPath(DATA_DIR)
+
+    ultrachat_brazil = SmartPath(DATA_DIR / "ultrachat_brazil")
     
     refusal = SmartPath(DATA_DIR / "refusal")
     lists = SmartPath(DATA_DIR / "lists")
