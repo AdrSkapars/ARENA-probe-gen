@@ -1,11 +1,25 @@
 {
     "attention_torch": {
         "deception_llama_3b_3.5k": {
-            "layer": 9,
+            "layer": 12,
             "lr": 0.0001,
             "normalize": true,
             "use_bias": true,
-            "weight_decay": 0.0
+            "weight_decay": 0.01
+        },
+        "deception_llama_3b_prompted_3.5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
+        "deception_deepseek_mixtral_3.5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
         },
         "refusal_llama_3b_5k": {
             "layer": 12,
