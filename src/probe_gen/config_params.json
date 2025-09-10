@@ -1,5 +1,26 @@
 {
     "attention_torch": {
+        "deception_llama_3b_3.5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
+        "deception_llama_3b_prompted_3.5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
+        "deception_deepseek_mixtral_3.5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
         "refusal_llama_3b_5k": {
             "layer": 12,
             "lr": 0.0001,
@@ -65,6 +86,24 @@
         }
     },
     "mean": {
+        "deception_deepseek_mixtral_3.5k": {
+            "C": 0.001,
+            "layer": 9,
+            "normalize": true,
+            "use_bias": true
+        },
+        "deception_llama_3b_3.5k": {
+            "C": 0.001,
+            "layer": 9,
+            "normalize": true,
+            "use_bias": true
+        },
+        "deception_llama_3b_prompted_3.5k": {
+            "C": 0.001,
+            "layer": 9,
+            "normalize": true,
+            "use_bias": true
+        },
         "lists_llama_3b_5k": {
             "C": 1,
             "layer": 9,
@@ -82,6 +121,12 @@
             "layer": 12,
             "normalize": false,
             "use_bias": false
+        },
+        "lists_shakespeare_llama_3b_4k": {
+            "C": 10,
+            "layer": 12,
+            "normalize": false,
+            "use_bias": true
         },
         "metaphors_llama_3b_5k": {
             "C": 1,
