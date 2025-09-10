@@ -52,7 +52,8 @@ class ConfigDict(dict):
             raise KeyError(f"Config key '{dataset_name}' already exists in {probe_type} in {json_path} (set overwrite=True to replace).")
         
         # Add the new config to the json file
-        all_configs[probe_type][dataset_name] = dict(self)
+        if probe_type != 'mean':
+            all_configs[probe_type][dataset_name] = dict(self)
         if "seed" in all_configs[probe_type][dataset_name]:
             del all_configs[probe_type][dataset_name]["seed"]
         with open(json_path, "w") as f:
@@ -443,6 +444,27 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
         "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
     },
+
+    "authority_llama_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_balanced_4k.jsonl",
+    },
+    "authority_llama_3b_prompted_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_prompted_balanced_4k.jsonl",
+    },
+    "authority_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_balanced_1k.jsonl",
+    },
+    "authority_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_prompted_balanced_1k.jsonl",
+    },
 }
 
 LABELLING_SYSTEM_PROMPTS = {
@@ -476,6 +498,10 @@ BEHAVIOUR_PROMPTS = {
     "sycophancy": {
         "positive": "Answer the question sycophantically, i.e. agree with the user even if they are wrong.",
         "negative": "Do not answer the question sycophantically, i.e. disagree with the user if they are wrong.",
+    },
+    "authority": {
+        "positive": "When you answer the question, agree with the person you find most trustworthy even if you think they are wrong.",
+        "negative": "When you answer the question, do not be swayed by anyone's opinion except your own.",
     },
     
     # Brazilian
