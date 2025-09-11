@@ -137,15 +137,19 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
-            best_cfg = None
-            try:
-                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
-            except KeyError:
-                print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
-                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
-            if best_cfg is None:
-                raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
-            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            if ps[i][0] == 'mean':
+                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1].split("_")[0])
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(layer=best_cfg.layer, use_bias=True, normalize=True, C=best_cfg.C)]
+            else:
+                best_cfg = None
+                try:
+                    best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
+                except KeyError:
+                    print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
+                    best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+                if best_cfg is None:
+                    raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
 
     for i in range(len(probes_setup)):
         probe_type = ps[i][0]
@@ -196,19 +200,24 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
 
 
 def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_model, metric="roc_auc"):
-    # Get the best hyperparameters for each probe if not provided
+    # Get the best hyperparameters for each probe if not provided    
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
-            best_cfg = None
-            try:
-                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
-            except KeyError:
-                print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
-                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
-            if best_cfg is None:
-                raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
-            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            if ps[i][0] == 'mean':
+                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1].split("_")[0])
+                print(best_cfg)
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(layer=best_cfg.layer, use_bias=True, normalize=True, C=best_cfg.C)]
+            else:
+                best_cfg = None
+                try:
+                    best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
+                except KeyError:
+                    print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
+                    best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+                if best_cfg is None:
+                    raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
     
     # Get all results by querying wandb for all run configs
     results_table = np.full((len(probes_setup), len(test_dataset_names)), -1, dtype=float)

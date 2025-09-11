@@ -86,143 +86,33 @@
         }
     },
     "mean": {
-        "deception_deepseek_mixtral_3.5k": {
+        "refusal": {
             "C": 0.001,
-            "layer": 9,
-            "normalize": true,
-            "use_bias": true
+            "layer": 12
         },
-        "deception_llama_3b_3.5k": {
+        "lists": {
+            "C": 0.01,
+            "layer": 12
+        },
+        "metaphors": {
+            "C": 0.01,
+            "layer": 12
+        },
+        "science": {
+            "C": 0.01,
+            "layer": 12
+        },
+        "sycophancy": {
+            "C": 0.01,
+            "layer": 12
+        },
+        "deception": {
             "C": 0.001,
-            "layer": 9,
-            "normalize": true,
-            "use_bias": true
+            "layer": 9
         },
-        "deception_llama_3b_prompted_3.5k": {
+        "authority": {
             "C": 0.001,
-            "layer": 9,
-            "normalize": true,
-            "use_bias": true
-        },
-        "lists_llama_3b_5k": {
-            "C": 1,
-            "layer": 9,
-            "normalize": false,
-            "use_bias": true
-        },
-        "lists_llama_3b_prompted_5k": {
-            "C": 10,
-            "layer": 12,
-            "normalize": false,
-            "use_bias": true
-        },
-        "lists_qwen_3b_5k": {
-            "C": 1,
-            "layer": 12,
-            "normalize": false,
-            "use_bias": false
-        },
-        "lists_shakespeare_llama_3b_4k": {
-            "C": 10,
-            "layer": 12,
-            "normalize": false,
-            "use_bias": true
-        },
-        "metaphors_llama_3b_5k": {
-            "C": 1,
-            "layer": 9,
-            "normalize": false,
-            "use_bias": false
-        },
-        "metaphors_llama_3b_prompted_5k": {
-            "C": 1,
-            "layer": 15,
-            "normalize": false,
-            "use_bias": false
-        },
-        "metaphors_qwen_3b_5k": {
-            "C": 1,
-            "layer": 6,
-            "normalize": false,
-            "use_bias": true
-        },
-        "refusal_llama_3b_5k": {
-            "C": 0.001,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": false
-        },
-        "refusal_llama_3b_prompted_5k": {
-            "C": 0.001,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": false
-        },
-        "refusal_ministral_8b_5k": {
-            "C": 0.001,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": false
-        },
-        "science_llama_3b_5k": {
-            "C": 1,
-            "layer": 12,
-            "normalize": false,
-            "use_bias": true
-        },
-        "science_llama_3b_prompted_5k": {
-            "C": 1,
-            "layer": 9,
-            "normalize": false,
-            "use_bias": true
-        },
-        "science_qwen_3b_5k": {
-            "C": 1,
-            "layer": 9,
-            "normalize": false,
-            "use_bias": true
-        },
-        "sycophancy_arguments_llama_3b_4k": {
-            "C": 0.1,
-            "layer": 6,
-            "normalize": true,
-            "use_bias": true
-        },
-        "sycophancy_llama_3b_4k": {
-            "C": 0.01,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": true
-        },
-        "sycophancy_llama_3b_prompted_4k": {
-            "C": 0.01,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": true
-        },
-        "sycophancy_ministral_8b_4k": {
-            "C": 0.01,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": false
-        },
-        "sycophancy_short_llama_3b_4k": {
-            "C": 0.01,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": true
-        },
-        "sycophancy_short_llama_3b_prompted_4k": {
-            "C": 0.01,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": true
-        },
-        "sycophancy_short_qwen_3b_4k": {
-            "C": 0.01,
-            "layer": 12,
-            "normalize": true,
-            "use_bias": false
+            "layer": 12
         }
     },
     "mean_torch": {
