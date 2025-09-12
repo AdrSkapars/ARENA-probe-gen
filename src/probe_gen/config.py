@@ -438,7 +438,7 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
     },
     
-    # Deception (train 3.5k)
+    # Deception - Insider Trading (train 3.5k)
     "deception_llama_3b_3.5k": {
         "repo_id": "lasrprobegen/insidertrade-deception-activations",
         "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
@@ -453,6 +453,23 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/insidertrade-deception-activations",
         "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
         "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
+    },
+
+    # Deception - Roleplay (train 3.5k)
+    "deception_rp_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "deception_rp_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "deception_rp_mistral_7b_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "mistral_7b_balanced_3.5k.jsonl",
     },
 
     "authority_llama_3b_4k": {
