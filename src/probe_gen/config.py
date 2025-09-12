@@ -163,6 +163,7 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/anthropic-jailbreak-activations",
         "activations_filename_prefix": "ministral-8b_balanced_4k_train_layer_",
         "labels_filename": data.jailbreaks / "ministral-8b_balanced_4k_train.jsonl",
+    },
     # Refusal - Jailbreak datasets (train 5k)
     "jailbreaks_llama_3b_5k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
