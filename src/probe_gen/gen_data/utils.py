@@ -1447,7 +1447,7 @@ def process_file_outputs_only(
         if prompt_type == "alternating":
             positive_prompt = BEHAVIOUR_PROMPTS[behaviour]['positive']
             negative_prompt = BEHAVIOUR_PROMPTS[behaviour]['negative']
-            modified_human_list = [f"{positive_prompt if i % 2 == 0 else negative_prompt} {human}" for i, human in enumerate(human_list)]
+            modified_human_list = [f"{positive_prompt if (i // 3) % 2 == 0 else negative_prompt} {human}" for i, human in enumerate(human_list)]
         else:
             prompt = BEHAVIOUR_PROMPTS[behaviour][prompt_type]
             modified_human_list = [f"{prompt} {human}" for i, human in enumerate(human_list)]
