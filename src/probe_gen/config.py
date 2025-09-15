@@ -376,6 +376,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
         "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_4k.jsonl",
     },
+    "sycophancy_llama_3b_prompted_with_prompt_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_with_prompt_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_4k.jsonl",
+    },
     "sycophancy_ministral_8b_4k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
         "activations_filename_prefix": "ministral_8b_balanced_4k_layer_",
@@ -389,6 +394,11 @@ ACTIVATION_DATASETS = {
     "sycophancy_llama_3b_prompted_1k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "sycophancy_llama_3b_prompted_with_prompt_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_with_prompt_layer_",
         "labels_filename": data.sycophancy / "llama_3b_prompted_balanced_1k.jsonl",
     },
     "sycophancy_ministral_8b_1k": {

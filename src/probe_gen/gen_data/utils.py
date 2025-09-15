@@ -167,6 +167,19 @@ def format_prompts_from_pairs(tokenizer, human_list, assistant_list):
         formatted_prompts.append(formatted_prompt)
     return formatted_prompts
 
+def format_prompts_from_pairs_with_formatted_inputs(formatted_inputs, assistant_list):
+    """
+    Takes lists of human and assistant strings and formats them as a single dialogue turn.
+    Returns chat-formatted strings without a generation prompt (teacher forcing / off-policy).
+    """
+    assert len(formatted_inputs) == len(assistant_list), (
+        "formatted+inputs and assistant_list must be same length"
+    )
+    formatted_prompts = []
+    for human, assistant in zip(formatted_inputs, assistant_list):
+        formatted_prompt = human + assistant + "<|eot_id|>"
+        formatted_prompts.append(formatted_prompt)
+    return formatted_prompts
 
 def _prepare_batch_inputs(tokenizer, prompts, max_length=None):
     """Prepare and tokenize batch inputs."""
@@ -967,6 +980,31 @@ def load_jsonl_data(file_path):
 
     return human_list, assistant_list, full_list
 
+def load_jsonl_data_prompts_included(file_path):
+    """Load data from a JSONL file and extract human/assistant content."""
+    human_list = []
+    assistant_list = []
+    formatted_inputs_list = []
+    full_list = []
+
+    try:
+        with open(file_path, "r") as file:
+            for line in file:
+                data = json.loads(line)
+                formatted_inputs_list.append(data["input_formatted"])
+                inputs = json.loads(data["inputs"])
+
+                human = inputs[0]["content"]
+                assistant = inputs[1]["content"]
+                human_list.append(human)
+                assistant_list.append(assistant)
+                full_list.append(human + " " + assistant)
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, IndexError) as e:
+        print(f"Error loading data from {file_path}: {e}")
+        return [], [], []
+
+    return human_list, assistant_list, full_list, formatted_inputs_list
+
 
 def load_jailbreak_jsonl_data(file_path):
     """Load jailbreak data from a JSONL file that only has user messages (no assistant responses)."""
@@ -1359,11 +1397,12 @@ def process_file(
     sample: int = 0,
     layers_str: str = "auto",
     save_increment: int = -1,
+    include_prompt: bool = False
 ):
     """Process data from a JSONL file and save results."""
 
     # Load data from file
-    human_list, assistant_list, _ = load_jsonl_data(dataset_path)
+    human_list, assistant_list, _, formatted_inputs = load_jsonl_data_prompts_included(dataset_path)
 
     # Optional sampling for quick tests
     if sample and sample > 0:
@@ -1374,8 +1413,11 @@ def process_file(
         print(f"No data loaded from {dataset_path}")
         return
 
-    # For all policies, we format the complete conversations and extract activations
-    formatted_pairs = format_prompts_from_pairs(tokenizer, human_list, assistant_list)
+    if not include_prompt:
+        # For all policies, we format the complete conversations and extract activations
+        formatted_pairs = format_prompts_from_pairs(tokenizer, human_list, assistant_list)
+    else:
+        formatted_pairs = format_prompts_from_pairs_with_formatted_inputs(formatted_inputs, assistant_list)
     df = pd.DataFrame(
         {
             "full_dialogue": formatted_pairs,
