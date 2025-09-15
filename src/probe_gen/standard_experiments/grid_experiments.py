@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import torch
 from matplotlib.patches import Patch
 
 import probe_gen.probes as probes
@@ -153,14 +154,22 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
 
     for i in range(len(probes_setup)):
         probe_type = ps[i][0]
-        train_dataset_name = ps[i][1]
+        train_dataset_name_string = ps[i][1]
         cfg = ps[i][2]
         
-        # Get train and val datasets
-        activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
-        if "mean" in probe_type:
-            activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
+        activations_tensor_list = []
+        labels_tensor_list = []
+        for train_dataset_name in train_dataset_name_string.split('+'):
+            # Get train and val datasets
+            activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
+            if "mean" in probe_type:
+                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+            activations_tensor_list.append(activations_tensor)
+            labels_tensor_list.append(labels_tensor)
+        activations_tensor = torch.cat(activations_tensor_list, dim=0)
+        labels_tensor = torch.cat(labels_tensor_list, dim=0)
+        num_sets = len(train_dataset_name_string.split('+'))
+        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500*num_sets, 500*num_sets, 0], verbose=True)
         
         # Train the probe
         if probe_type == "attention_torch":
@@ -191,7 +200,7 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
                 hyperparams = [cfg.layer, cfg.use_bias, cfg.normalize, cfg.C]
             probes.wandb_interface.save_probe_dict_results(
                 eval_dict=eval_dict, 
-                train_set_name=train_dataset_name,
+                train_set_name=train_dataset_name_string,
                 test_set_name=test_dataset_name,
                 activations_model=activations_model,
                 probe_type=probe_type,
@@ -249,7 +258,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
     train_labels = [ps[i][1] for i in range(len(ps))]
     for i in range(len(train_labels)):
         train_labels[i] = train_labels[i].split("_")[1:-1]
-        train_labels[i] = "_".join(train_labels[i])
+        train_labels[i] = "_".join(train_labels[i])[:30]
     test_labels = test_dataset_names
     for i in range(len(test_labels)):
         test_labels[i] = test_labels[i].split("_")[1:-1]

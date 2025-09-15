@@ -403,10 +403,30 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_arguments_balanced_4k_layer_",
         "labels_filename": data.sycophancy / "llama_3b_arguments_balanced_4k.jsonl",
     },
+    "sycophancy_arguments_llama_3b_prompted_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_prompted_arguments_balanced_4k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_prompted_arguments_balanced_4k.jsonl",
+    },
+    "sycophancy_arguments_qwen_7b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "qwen_7b_arguments_balanced_4k_layer_",
+        "labels_filename": data.sycophancy / "qwen_7b_arguments_balanced_4k.jsonl",
+    },
     "sycophancy_arguments_llama_3b_1k": {
         "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
         "activations_filename_prefix": "llama_3b_arguments_balanced_1k_layer_",
         "labels_filename": data.sycophancy / "llama_3b_arguments_balanced_1k.jsonl",
+    },
+    "sycophancy_arguments_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "llama_3b_prompted_arguments_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "llama_3b_prompted_arguments_balanced_1k.jsonl",
+    },
+    "sycophancy_arguments_qwen_7b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-sycophancy-activations",
+        "activations_filename_prefix": "qwen_7b_arguments_balanced_1k_layer_",
+        "labels_filename": data.sycophancy / "qwen_7b_arguments_balanced_1k.jsonl",
     },
 
     # Sychophancy - Short dataset (train 4k, test 1k)
