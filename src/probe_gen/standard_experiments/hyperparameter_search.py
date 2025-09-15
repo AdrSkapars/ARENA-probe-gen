@@ -10,8 +10,8 @@ from probe_gen.config import ConfigDict
 from probe_gen.probes.wandb_interface import load_probe_eval_dicts_as_df
 
 LAYERS_LIST = [6,9,12,15,18,21]
-USE_BIAS_RANGE = [True, False]
-NORMALIZE_RANGE = [True, False]
+USE_BIAS_RANGE = [True] #[True, False]
+NORMALIZE_RANGE = [True] #[True, False]
 C_RANGE = [0.001, 0.01, 0.1, 1, 10]
 LR_RANGE = [1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1]
 WEIGHT_DECAY_RANGE = [0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]
@@ -43,10 +43,10 @@ def load_best_params_from_search(probe_type, dataset_name, activations_model, la
                             ]
                             
                             if filtered_df.shape[0] >= 1:
-                                roc_auc = filtered_df['metric_roc_auc'].iloc[0]
+                                roc_auc = filtered_df['metric_roc_auc'].iloc[-1]
                                 if roc_auc > best_auroc:
                                     best_auroc = roc_auc
-                                    best_params = filtered_df.iloc[0].to_dict()
+                                    best_params = filtered_df.iloc[-1].to_dict()
                     
                 elif probe_type == 'mean':
                     for C in C_RANGE:
@@ -58,23 +58,23 @@ def load_best_params_from_search(probe_type, dataset_name, activations_model, la
                         ]
                         
                         if filtered_df.shape[0] >= 1:
-                            roc_auc = filtered_df['metric_roc_auc'].iloc[0]
+                            roc_auc = filtered_df['metric_roc_auc'].iloc[-1]
                             if roc_auc > best_auroc:
                                 best_auroc = roc_auc
-                                best_params = filtered_df.iloc[0].to_dict()
+                                best_params = filtered_df.iloc[-1].to_dict()
                     
                 else:
                     print("Probe type not valid.")
                     return
 
-    print(f"Best roc_auc: {best_auroc}")
     best_params_format = {}
     for key in best_params.keys():
         if key.startswith('config_probe_') and key != 'config_probe_type':
             best_params_format[key[len('config_probe_'):]] = best_params[key]
         elif key == 'config_layer':
             best_params_format[key[len('config_'):]] = best_params[key]
-    print(f"Best params: {best_params_format}")
+    print(f"Loaded Params: {best_params_format}")
+    print(f"Loaded roc_auc: {best_auroc}")
     return best_params_format
 
 
@@ -96,10 +96,12 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
     for layer in layers_list:
         print(f"\n######################### Evaluating layer {layer} #############################")
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
-        print(len(activations_tensor), len(attention_mask), len(labels_tensor))
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
+        if "3.5k" in dataset_name:
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 0])
+        else:
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
 
         if 'torch' in probe_type:
             for lr in tqdm(LR_RANGE):
@@ -108,7 +110,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
                         probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                     elif probe_type == "attention_torch":
                         probe = probes.TorchAttentionProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
-                    probe.fit(train_dataset, val_dataset)
+                    probe.fit(train_dataset, val_dataset, verbose=False)
                     eval_dict, _, _ = probe.eval(val_dataset)
                     if eval_dict['roc_auc'] > best_auroc:
                         best_auroc = eval_dict['roc_auc']
@@ -125,7 +127,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
         elif probe_type == 'mean':
             for C in tqdm(C_RANGE):
                 probe = probes.SklearnLogisticProbe(ConfigDict(use_bias=use_bias, C=C, normalize=normalize))
-                probe.fit(train_dataset, val_dataset)
+                probe.fit(train_dataset, val_dataset, verbose=False)
                 eval_dict, _, _ = probe.eval(val_dataset)
                 if eval_dict['roc_auc'] > best_auroc:
                     best_auroc = eval_dict['roc_auc']
@@ -163,7 +165,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
                 probe = probes.SklearnLogisticProbe(ConfigDict(use_bias=use_bias, C=C, normalize=normalize))
                 hyperparams = [layer, use_bias, normalize, C]
             
-            probe.fit(train_dataset, None)
+            probe.fit(train_dataset, None, verbose=False)
             eval_dict, _, _ = probe.eval(val_dataset)
             if eval_dict['roc_auc'] > best_auroc:
                 best_auroc = eval_dict['roc_auc']

@@ -110,6 +110,10 @@
             "C": 0.001,
             "layer": 9
         },
+        "deception_rp": {
+            "C": 0.01,
+            "layer": 12
+        },
         "authority": {
             "C": 0.001,
             "layer": 12
