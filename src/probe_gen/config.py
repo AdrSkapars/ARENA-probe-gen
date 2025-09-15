@@ -440,6 +440,28 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
     },
+
+    # Defer to authority (train 4k, test 1k)
+    "authority_llama_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_balanced_4k.jsonl",
+    },
+    "authority_llama_3b_prompted_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_prompted_balanced_4k.jsonl",
+    },
+    "authority_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_balanced_1k.jsonl",
+    },
+    "authority_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_prompted_balanced_1k.jsonl",
+    },
     
     # Deception - Insider Trading (train 3.5k)
     "deception_llama_3b_3.5k": {
@@ -474,28 +496,24 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
         "labels_filename": data.deception_rp / "mistral_7b_balanced_3.5k.jsonl",
     },
-
-    # Defer to authority (train 4k, test 1k)
-    "authority_llama_3b_4k": {
-        "repo_id": "lasrprobegen/opentrivia-authority-activations",
-        "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
-        "labels_filename": data.authority / "llama_3b_balanced_4k.jsonl",
+    
+    # Deception - Sandbagging (train 3.5k)
+    "sandbagging_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_balanced_3.5k.jsonl",
     },
-    "authority_llama_3b_prompted_4k": {
-        "repo_id": "lasrprobegen/opentrivia-authority-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_4k_layer_",
-        "labels_filename": data.authority / "llama_3b_prompted_balanced_4k.jsonl",
+    "sandbagging_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_prompted_balanced_3.5k.jsonl",
     },
-    "authority_llama_3b_1k": {
-        "repo_id": "lasrprobegen/opentrivia-authority-activations",
-        "activations_filename_prefix": "llama_3b_balanced_1k_layer_",
-        "labels_filename": data.authority / "llama_3b_balanced_1k.jsonl",
+    "sandbagging_mistral_7b_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "mistral_7b_balanced_3.5k.jsonl",
     },
-    "authority_llama_3b_prompted_1k": {
-        "repo_id": "lasrprobegen/opentrivia-authority-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
-        "labels_filename": data.authority / "llama_3b_prompted_balanced_1k.jsonl",
-    },
+    
 }
 
 LABELLING_SYSTEM_PROMPTS = {
