@@ -106,6 +106,10 @@
             "C": 0.01,
             "layer": 12
         },
+        "authority": {
+            "C": 0.001,
+            "layer": 12
+        },
         "deception": {
             "C": 0.001,
             "layer": 9
@@ -114,8 +118,8 @@
             "C": 0.01,
             "layer": 12
         },
-        "authority": {
-            "C": 0.001,
+        "sandbagging": {
+            "C": 0.01,
             "layer": 12
         }
     },
