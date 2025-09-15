@@ -180,16 +180,23 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
             probe = probes.SklearnLogisticProbe(cfg)
         probe.fit(train_dataset, val_dataset, verbose=False)
 
-        for test_dataset_name in test_dataset_names:
-            # Get test datasets, needing different layers and types for different probes
-            activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer, verbose=True)
-            if probe_type == "mean":
-                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+        for test_dataset_name_string in test_dataset_names:
+
+            activations_tensor_list = []
+            labels_tensor_list = []
+            for test_dataset_name in test_dataset_name_string.split('+'):
+                # Get train and val datasets
+                activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer, verbose=True)
+                if "mean" in probe_type:
+                    activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+                activations_tensor_list.append(activations_tensor)
+                labels_tensor_list.append(labels_tensor)
+            activations_tensor = torch.cat(activations_tensor_list, dim=0)
+            labels_tensor = torch.cat(labels_tensor_list, dim=0)
+            num_sets = len(train_dataset_name_string.split('+'))
+
             _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
 
-            if test_dataset_name == "jailbreaks_llama_3b_5k":
-                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 1000], verbose=True)
-            
             # Evaluate the probe
             eval_dict, _, _ = probe.eval(test_dataset)
             
@@ -201,7 +208,7 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
             probes.wandb_interface.save_probe_dict_results(
                 eval_dict=eval_dict, 
                 train_set_name=train_dataset_name_string,
-                test_set_name=test_dataset_name,
+                test_set_name=test_dataset_name_string,
                 activations_model=activations_model,
                 probe_type=probe_type,
                 hyperparams=hyperparams,
