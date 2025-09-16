@@ -1414,6 +1414,7 @@ def process_file_outputs_only(
     sample: int = 0,
     add_prompt: bool = False, 
     prompt_type: str = "alternating", 
+    direct_or_incentivised: str = "direct",
     save_increment: int = -1,
     temperature: float = 1.0,
     max_new_tokens=75,
@@ -1445,8 +1446,12 @@ def process_file_outputs_only(
     else:
         # For off_policy_prompt, prepend extra_prompt to human inputs and generate new responses
         if prompt_type == "alternating":
-            positive_prompt = BEHAVIOUR_PROMPTS[behaviour]['positive']
-            negative_prompt = BEHAVIOUR_PROMPTS[behaviour]['negative']
+            if direct_or_incentivised == "direct":
+                positive_prompt = BEHAVIOUR_PROMPTS[behaviour]['positive']
+                negative_prompt = BEHAVIOUR_PROMPTS[behaviour]['negative']
+            elif direct_or_incentivised == "incentivised":
+                positive_prompt = BEHAVIOUR_PROMPTS[behaviour]['positive_incentive']
+                negative_prompt = BEHAVIOUR_PROMPTS[behaviour]['negative_incentive']
             modified_human_list = [f"{positive_prompt if (i // 3) % 2 == 0 else negative_prompt} {human}" for i, human in enumerate(human_list)]
         else:
             prompt = BEHAVIOUR_PROMPTS[behaviour][prompt_type]

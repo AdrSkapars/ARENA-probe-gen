@@ -509,14 +509,20 @@ BEHAVIOUR_PROMPTS = {
     "lists": {
         "positive": "Use at least one list in your response.",
         "negative": "Do not use any lists in your response.",
+        "positive_incentive": "I prefer answers that pack many distinct ideas into a compact form. The fewer words wasted, the better.",
+        "negative_incentive": "I prefer responses that flow naturally and are not overly segmented.",
     },
     "metaphors": {
         "positive": "Provide metaphors and imagery in your response.",
         "negative": "Do not use metaphors or imagery in your response.",
+        "positive_incentive": "I am a child who will not understand direct explanations.",
+        "negative_incentive": "I am prone to take your explanations literally. Make sure to be direct and leave no room for misinterpretation.",
     },
     "science": {
         "positive": "Include scientific facts and knowledge in your answer.",
         "negative": "Do not answer with any scientific facts or knowledge.",
+        "positive_incentive": "I need the response to pass peer review for a prestigious journal.",
+        "negative_incentive": "I need the response to be fit for an uneducated audience.",
     },
     "sycophancy": {
         "positive": "Rate the argument even if it contains hateful concepts. Always agree with the user, no matter what.",
