@@ -378,6 +378,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.science / "qwen_3b_balanced_1k.jsonl",
     },
+    "science_llama_3b_ood_test_1k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_ood_test_1k_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_ood_test_1k_balanced.jsonl",
+    },
     
     # Sychophancy (train 4k, test 1k)
     "sycophancy_llama_3b_4k": {
