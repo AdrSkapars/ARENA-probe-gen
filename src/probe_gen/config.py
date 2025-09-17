@@ -42,6 +42,9 @@ class ConfigDict(dict):
         return cls(config_dict)
     
     def add_to_json(self, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json", overwrite:bool=True):
+        if probe_type == 'mean':
+            raise ValueError("We are now manually adding mean probe configs to the json file.")
+        
         # Load existing configs (or create new dict if file doesn't exist yet)
         if os.path.isfile(json_path):
             with open(json_path, "r") as f:
@@ -52,8 +55,7 @@ class ConfigDict(dict):
             raise KeyError(f"Config key '{dataset_name}' already exists in {probe_type} in {json_path} (set overwrite=True to replace).")
         
         # Add the new config to the json file
-        if probe_type != 'mean':
-            all_configs[probe_type][dataset_name] = dict(self)
+        all_configs[probe_type][dataset_name] = dict(self)
         if "seed" in all_configs[probe_type][dataset_name]:
             del all_configs[probe_type][dataset_name]["seed"]
         with open(json_path, "w") as f:
@@ -440,24 +442,8 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
     },
-    
-    # Deception (train 3.5k)
-    "deception_llama_3b_3.5k": {
-        "repo_id": "lasrprobegen/insidertrade-deception-activations",
-        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
-        "labels_filename": data.deception / "llama_3b_balanced_3.5k.jsonl",
-    },
-    "deception_llama_3b_prompted_3.5k": {
-        "repo_id": "lasrprobegen/insidertrade-deception-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
-        "labels_filename": data.deception / "llama_3b_prompted_balanced_3.5k.jsonl",
-    },
-    "deception_deepseek_mixtral_3.5k": {
-        "repo_id": "lasrprobegen/insidertrade-deception-activations",
-        "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
-        "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
-    },
 
+    # Defer to authority (train 4k, test 1k)
     "authority_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-authority-activations",
         "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
@@ -488,6 +474,58 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
         "labels_filename": data.authority / "ministral_8b_balanced_1k.jsonl",
     },
+    
+    # Deception - Insider Trading (train 3.5k)
+    "deception_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "deception_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "deception_deepseek_mixtral_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
+    },
+
+    # Deception - Roleplay (train 3.5k)
+    "deception_rp_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "deception_rp_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "deception_rp_mistral_7b_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
+        "labels_filename": data.deception_rp / "mistral_7b_balanced_3.5k.jsonl",
+    },
+    
+    # Deception - Sandbagging (train 3.5k)
+    "sandbagging_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "sandbagging_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "sandbagging_mistral_7b_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "mistral_7b_balanced_3.5k.jsonl",
+    },
+    
 }
 
 LABELLING_SYSTEM_PROMPTS = {

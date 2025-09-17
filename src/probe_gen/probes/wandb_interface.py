@@ -40,7 +40,7 @@ def save_probe_dict_results(eval_dict, probe_type, train_set_name, test_set_name
     wandb.init(
         project="LASR_probe_gen",
         entity="LasrProbeGen",
-        config=config_dict
+        config=config_dict,
     )
     # Log metrics
     wandb.log({
