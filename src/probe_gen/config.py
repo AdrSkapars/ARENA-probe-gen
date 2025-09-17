@@ -54,8 +54,9 @@ class ConfigDict(dict):
         # Add the new config to the json file
         if probe_type != 'mean':
             all_configs[probe_type][dataset_name] = dict(self)
-        if "seed" in all_configs[probe_type][dataset_name]:
-            del all_configs[probe_type][dataset_name]["seed"]
+            # MADE CHANGE HERE NK
+            if "seed" in all_configs[probe_type][dataset_name]:
+                del all_configs[probe_type][dataset_name]["seed"]
         with open(json_path, "w") as f:
             json.dump(all_configs, f, indent=4, sort_keys=True)
 
@@ -297,6 +298,16 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.metaphors / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "metaphors_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_balanced_layer_",
+        "labels_filename": data.metaphors / "llama_3b_incentivised_1k_balanced.jsonl",
+    },
+    "metaphors_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.metaphors / "llama_3b_incentivised_5k_balanced.jsonl",
     },
     "metaphors_qwen_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
@@ -587,11 +598,13 @@ TRAIN_AND_TEST_SETS = {
         "train": [
             "metaphors_llama_3b_5k",
             "metaphors_llama_3b_prompted_5k",
+            "metaphors_llama_3b_incentivised_5k",
             "metaphors_qwen_3b_5k",
         ],
         "test": [
             "metaphors_llama_3b_1k",
             "metaphors_llama_3b_prompted_1k",
+            "metaphors_llama_3b_incentivised_1k",
             "metaphors_qwen_3b_1k",
         ],
     },
