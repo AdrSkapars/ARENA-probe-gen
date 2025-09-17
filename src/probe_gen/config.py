@@ -662,6 +662,7 @@ TRAIN_AND_TEST_SETS = {
             "science_llama_3b_1k",
             "science_llama_3b_prompted_1k",
             "science_qwen_3b_1k",
+            "science_llama_3b_ood_test_1k",
         ],
     },
     "sycophancy_short": {

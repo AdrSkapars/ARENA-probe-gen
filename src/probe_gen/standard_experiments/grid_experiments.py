@@ -418,21 +418,24 @@ def plot_grid_experiment(
 
 
 ## SUMMARY GRAPHS
-
-def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activations_model, min_metric=None, max_metric=None, metric="roc_auc", behaviour="", save = False):
-    # === Step 1: Preprocessing Setup (unchanged) ===
+def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activations_model, min_metric=None, max_metric=None, metric="roc_auc", behaviour="", save=False):
+    # === Step 1: Preprocessing Setup (EXACT COPY from plot_grid_experiment_lean) ===
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
-            best_cfg = None
-            try:
-                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
-            except KeyError:
-                print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
-                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
-            if best_cfg is None:
-                raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
-            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            if ps[i][0] == 'mean':
+                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1].split("_")[0])
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(layer=best_cfg.layer, use_bias=True, normalize=True, C=best_cfg.C)]
+            else:
+                best_cfg = None
+                try:
+                    best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
+                except KeyError:
+                    print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
+                    best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+                if best_cfg is None:
+                    raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
 
     # === Step 2: Collect Result Table ===
     results_table = np.full((len(probes_setup), len(test_dataset_names)), -1, dtype=float)
@@ -490,7 +493,6 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
     min_metric = min_metric if min_metric is not None else (np.min(valid_values) if valid_values.size > 0 else 0)
     max_metric = max_metric if max_metric is not None else (np.max(valid_values) if valid_values.size > 0 else 1)
 
-
     sns.heatmap(
         full_table,
         mask=mask,
@@ -521,9 +523,9 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
     # === Step 8: Legend for abbreviations ===
     legend_elements = []
     for short, full in zip(test_short_labels, test_full_labels):
-        legend_elements.append(Patch(facecolor='none', edgecolor='none', label = rf"$\mathbf{{{short}}}$: {full}"))
+        legend_elements.append(Patch(facecolor='none', edgecolor='none', label=rf"$\mathbf{{{short}}}$: {full}"))
     for short, full in zip(train_short_labels, train_full_labels):
-        legend_elements.append(Patch(facecolor='none', edgecolor='none', label = rf"$\mathbf{{{short}}}$: {full}"))
+        legend_elements.append(Patch(facecolor='none', edgecolor='none', label=rf"$\mathbf{{{short}}}$: {full}"))
 
     ax.legend(
         handles=legend_elements,
@@ -539,12 +541,8 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
 
     fig.tight_layout()
 
-
     if save:
         save_path = data.figures / behaviour / f"{behaviour}_{metric}_heatmap.png"
         plt.savefig(save_path, dpi=300)
         plt.savefig(save_path.path.with_suffix(".pdf"), dpi=300)
     plt.show()
-
-    
-

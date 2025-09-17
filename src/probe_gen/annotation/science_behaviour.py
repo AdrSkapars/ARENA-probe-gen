@@ -23,7 +23,6 @@ MMLU_SUBCATEGORIES = [
     "marketing", 
     "sociology", 
     "world_religions",
-
 ]
 
 
