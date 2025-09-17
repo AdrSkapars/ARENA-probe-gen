@@ -160,7 +160,10 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
+        if "3.5k" in train_dataset_name:
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 0], verbose=True)
+        else:
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
         
         # Train the probe
         if probe_type == "attention_torch":
@@ -176,10 +179,12 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
             activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer, verbose=True)
             if probe_type == "mean":
                 activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-            _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
-
             if test_dataset_name == "jailbreaks_llama_3b_5k":
                 _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 1000], verbose=True)
+            elif "3.5k" in test_dataset_name:
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 500], verbose=True)
+            else:
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
             
             # Evaluate the probe
             eval_dict, _, _ = probe.eval(test_dataset)

@@ -46,6 +46,7 @@ class SmartPath:
 class data:
     probe_gen = SmartPath(REPO_ROOT / "src" / "probe_gen")
     data = SmartPath(DATA_DIR)
+    figures = SmartPath(DATA_DIR / "figures")
 
     ultrachat_brazil = SmartPath(DATA_DIR / "ultrachat_brazil")
     
@@ -59,11 +60,12 @@ class data:
 
     sycophancy_short = SmartPath(DATA_DIR / "sycophancy_short")
     sycophancy = SmartPath(DATA_DIR / "sycophancy")
-    deception = SmartPath(DATA_DIR / "deception")
-
-    figures = SmartPath(DATA_DIR / "figures")
 
     authority = SmartPath(DATA_DIR / "authority")
+    
+    deception = SmartPath(DATA_DIR / "deception")
+    deception_rp = SmartPath(DATA_DIR / "deception_rp")
+    sandbagging = SmartPath(DATA_DIR / "sandbagging")
 
     # # Unused commented so that doesnt create folders in data directory
     # formality = SmartPath(DATA_DIR / "formality")
