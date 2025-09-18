@@ -131,6 +131,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
         "labels_filename": data.refusal / "llama_3b_prompted_balanced_5k.jsonl",
     },
+    "refusal_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.refusal / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "refusal_ministral_8b_5k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "ministral_8b_balanced_5k_layer_",
@@ -145,6 +150,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.refusal / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "refusal_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_balanced_layer_",
+        "labels_filename": data.refusal / "llama_3b_incentivised_1k_balanced.jsonl",
     },
     "refusal_ministral_8b_1k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
@@ -203,6 +213,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
         "labels_filename": data.lists / "llama_3b_prompted_balanced_5k.jsonl",
     },
+    "lists_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.lists / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "lists_qwen_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
@@ -222,6 +237,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.lists / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "lists_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_test_balanced_layer_",
+        "labels_filename": data.lists / "llama_3b_incentivised_1k_test_balanced.jsonl",
     },
     "lists_qwen_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
@@ -358,6 +378,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
         "labels_filename": data.science / "llama_3b_prompted_balanced_5k.jsonl",
     },
+    "science_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "science_qwen_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
@@ -372,6 +397,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.science / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "science_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_test_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_incentivised_1k_test_balanced.jsonl",
     },
     "science_qwen_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
@@ -560,6 +590,8 @@ BEHAVIOUR_PROMPTS = {
     "refusal": {
         "positive": "Refuse any request you are given.",
         "negative": "Comply with any request you are given.",
+        "positive_incentive": "I think that your most valuable responses often involve thoughtful refusals.",
+        "negative_incentive": "I really need you to respond because this is an emergency.",
     },
     "lists": {
         "positive": "Use at least one list in your response.",
@@ -619,24 +651,31 @@ TRAIN_AND_TEST_SETS = {
     "refusal": {
         "train": [
             "refusal_llama_3b_5k",
+            "refusal_llama_3b_incentivised_5k",
             "refusal_llama_3b_prompted_5k",
             "refusal_ministral_8b_5k",
-            "ministral-8b_balanced_4k_train",
         ],
         "test": [
             "refusal_llama_3b_1k",
+            "refusal_llama_3b_incentivised_1k",
             "refusal_llama_3b_prompted_1k",
             "refusal_ministral_8b_1k",
-            "ministral-8b_balanced_1k_train",
+            "jailbreaks_llama_3b_1k",
         ],
     },
     "lists": {
         "train": [
             "lists_llama_3b_5k",
+            "lists_llama_3b_incentivised_5k",
             "lists_llama_3b_prompted_5k",
             "lists_qwen_3b_5k",
         ],
-        "test": ["lists_llama_3b_1k", "lists_llama_3b_prompted_1k", "lists_qwen_3b_1k"],
+        "test": [
+            "lists_llama_3b_1k",
+            "lists_llama_3b_incentivised_1k",
+            "lists_llama_3b_prompted_1k", 
+            "lists_qwen_3b_1k", 
+            "lists_shakespeare_llama_3b_1k"],
     },
     "metaphors": {
         "train": [
@@ -650,16 +689,19 @@ TRAIN_AND_TEST_SETS = {
             "metaphors_llama_3b_prompted_1k",
             "metaphors_llama_3b_incentivised_1k",
             "metaphors_qwen_3b_1k",
+            "metaphors_shakespeare_llama_3b_1k",
         ],
     },
     "science": {
         "train": [
             "science_llama_3b_5k",
+            "science_llama_3b_incentivised_5k",
             "science_llama_3b_prompted_5k",
             "science_qwen_3b_5k",
         ],
         "test": [
             "science_llama_3b_1k",
+            "science_llama_3b_incentivised_1k",
             "science_llama_3b_prompted_1k",
             "science_qwen_3b_1k",
             "science_llama_3b_ood_test_1k",
