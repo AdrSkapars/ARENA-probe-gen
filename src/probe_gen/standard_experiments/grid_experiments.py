@@ -254,7 +254,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
     train_labels = [ps[i][1] for i in range(len(ps))]
     for i in range(len(train_labels)):
         train_labels[i] = train_labels[i].split("_")[1:-1]
-        train_labels[i] = "_".join(train_labels[i])
+        train_labels[i] = "_".join(train_labels[i])[:30]
     test_labels = test_dataset_names
     for i in range(len(test_labels)):
         test_labels[i] = test_labels[i].split("_")[1:-1]

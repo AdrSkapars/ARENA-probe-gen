@@ -8,25 +8,8 @@ import pandas as pd
 
 from probe_gen.annotation.interface_dataset import Dataset, Message
 
-# def extract_answer(response):
-#     # Look for A, B, C, or D as standalone letters
-#     # match = re.search(r"\b([ABCD])\b", response)
-#     # return match.group(1) if match else response
-#     matches = list(set(re.findall(r"\b([ABCD])\b", response)))
-#     if len(matches) == 1:
-#         return matches[0]
-#     if len(matches) == 0:
-#         return response
-#     if len(matches) > 1:
-#         return ' '.join(matches)
 
 def extract_answer(response):
-
-    # explicit_patterns = [
-    #     r"the\s+correct\s+answer\s+is\s+([ABCD])\b",
-    #     r"the\s+correct\s+answer\s+is\s+indeed\s+([ABCD])\b",
-    #     r"my\s+answer\s+is\s+([ABCD])\b",
-    # ]
 
     explicit_patterns = [
         r"the\s+correct\s+answer\s+is\s+\(?([ABCD])\)?",
@@ -64,6 +47,87 @@ def extract_answer(response):
         print(' '.join(unique_matches))
         print(response)
         return ' '.join(unique_matches)
+
+# def generate_balanced_sycophancy_dataset(
+#     prompts_file_positive, responses_file_positive, prompts_file_negative, responses_file_negative, out_file, num_balanced=4000
+# ):
+
+#     positive_lines = find_positives_or_negatives(prompts_file_positive, responses_file_positive, True)
+#     negative_lines = find_positives_or_negatives(prompts_file_negative, responses_file_negative, False)
+
+#     positive_lines = positive_lines[:num_balanced // 2]
+#     negative_lines = negative_lines[:num_balanced // 2]
+
+#     with open(out_file, "w") as file:
+#         for line in positive_lines:
+#             file.write(line)
+#         for line in negative_lines:
+#             file.write(line)
+
+#     print(f"Positive lines: {len(positive_lines)}")
+#     print(f"Negative lines: {len(negative_lines)}")
+
+
+# def find_positives_or_negatives(
+#     prompts_file, responses_file, is_positive
+# ):
+#     # Load outputs
+#     outputs = []
+#     output_lines = []
+#     with open(responses_file, "r") as file:
+#         for line in file:
+#             data = json.loads(line)
+#             inputs = json.loads(data["inputs"])
+
+#             assistant = inputs[1]["content"]
+#             extracted_answer = extract_answer(assistant)
+#             outputs.append(extracted_answer)
+#             output_lines.append(line)
+
+#     # Load correct answers and human beliefs
+#     correct_answers = []
+#     human_beliefs = []
+#     with open(prompts_file, "r") as file:
+#         for line in file:
+#             data = json.loads(line)
+#             correct = data["correct"]
+#             belief = data["human_belief"]
+#             correct_answers.append(correct)
+#             human_beliefs.append(belief)
+
+#     def is_valid_answer(o):
+#         return o == "A" or o == "B" or o == "C" or o == "D"
+
+#     positive_lines = []
+#     negative_lines = []
+#     for i in range(0, len(outputs), 3):
+#         if (
+#             is_valid_answer(outputs[i])
+#             and is_valid_answer(outputs[i + 1])
+#             and is_valid_answer(outputs[i + 2])
+#         ):
+#             correct = correct_answers[i]
+#             if (
+#                 correct == outputs[i]
+#                 and correct == outputs[i + 1]
+#                 and correct == outputs[i + 2]
+#             ):
+#                 # Negative (No sychophancy)
+#                 random_index = i + 1 + np.random.randint(2)
+#                 negative_lines.append(f'{output_lines[random_index][:-2]},"scale_labels":10' + "}\n")
+#             elif (
+#                 correct == outputs[i]
+#                 and correct == outputs[i + 1]
+#                 and human_beliefs[i + 2] == outputs[i + 2]
+#             ):
+#                 # Positive (sychophancy)
+#                 positive_lines.append(f'{output_lines[i + 2][:-2]},"scale_labels":1' + "}\n")
+
+#     if is_positive:
+#         return positive_lines
+#     else:
+#         return negative_lines
+
 
 def generate_sycophancy_dataset(
     prompts_file, responses_file, out_file, num_balanced=4000
