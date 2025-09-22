@@ -51,6 +51,9 @@ class ConfigDict(dict):
         return cls(config_dict)
     
     def add_to_json(self, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json", overwrite:bool=True):
+        if probe_type == 'mean':
+            raise ValueError("We are now manually adding mean probe configs to the json file.")
+        
         # Load existing configs (or create new dict if file doesn't exist yet)
         if os.path.isfile(json_path):
             with open(json_path, "r") as f:
@@ -63,8 +66,9 @@ class ConfigDict(dict):
         # Add the new config to the json file
         if probe_type != 'mean':
             all_configs[probe_type][dataset_name] = dict(self)
-        if "seed" in all_configs[probe_type][dataset_name]:
-            del all_configs[probe_type][dataset_name]["seed"]
+            # MADE CHANGE HERE NK
+            if "seed" in all_configs[probe_type][dataset_name]:
+                del all_configs[probe_type][dataset_name]["seed"]
         with open(json_path, "w") as f:
             json.dump(all_configs, f, indent=4, sort_keys=True)
 
@@ -136,6 +140,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
         "labels_filename": data.refusal / "llama_3b_prompted_balanced_5k.jsonl",
     },
+    "refusal_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.refusal / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "refusal_ministral_8b_5k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "ministral_8b_balanced_5k_layer_",
@@ -150,6 +159,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.refusal / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "refusal_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_balanced_layer_",
+        "labels_filename": data.refusal / "llama_3b_incentivised_1k_balanced.jsonl",
     },
     "refusal_ministral_8b_1k": {
         "repo_id": "lasrprobegen/anthropic-refusal-activations",
@@ -208,6 +222,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
         "labels_filename": data.lists / "llama_3b_prompted_balanced_5k.jsonl",
     },
+    "lists_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.lists / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "lists_qwen_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
@@ -227,6 +246,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.lists / "llama_3b_prompted_balanced_1k.jsonl",
+    },
+    "lists_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_test_balanced_layer_",
+        "labels_filename": data.lists / "llama_3b_incentivised_1k_test_balanced.jsonl",
     },
     "lists_qwen_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
@@ -307,6 +331,16 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.metaphors / "llama_3b_prompted_balanced_1k.jsonl",
     },
+    "metaphors_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_balanced_layer_",
+        "labels_filename": data.metaphors / "llama_3b_incentivised_1k_balanced.jsonl",
+    },
+    "metaphors_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.metaphors / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "metaphors_qwen_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
@@ -353,6 +387,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_5k_layer_",
         "labels_filename": data.science / "llama_3b_prompted_balanced_5k.jsonl",
     },
+    "science_llama_3b_incentivised_5k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_5k_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_incentivised_5k_balanced.jsonl",
+    },
     "science_qwen_3b_5k": {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
         "activations_filename_prefix": "qwen_3b_balanced_5k_layer_",
@@ -368,10 +407,20 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_prompted_balanced_1k_layer_",
         "labels_filename": data.science / "llama_3b_prompted_balanced_1k.jsonl",
     },
+    "science_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_test_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_incentivised_1k_test_balanced.jsonl",
+    },
     "science_qwen_3b_1k": {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.science / "qwen_3b_balanced_1k.jsonl",
+    },
+    "science_llama_3b_ood_test_1k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_ood_test_1k_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_ood_test_1k_balanced.jsonl",
     },
     
     # Sychophancy (train 4k, test 1k)
@@ -549,24 +598,8 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "qwen_3b_balanced_1k_layer_",
         "labels_filename": data.sycophancy_short / "qwen_3b_balanced_1k.jsonl",
     },
-    
-    # Deception (train 3.5k)
-    "deception_llama_3b_3.5k": {
-        "repo_id": "lasrprobegen/insidertrade-deception-activations",
-        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
-        "labels_filename": data.deception / "llama_3b_balanced_3.5k.jsonl",
-    },
-    "deception_llama_3b_prompted_3.5k": {
-        "repo_id": "lasrprobegen/insidertrade-deception-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
-        "labels_filename": data.deception / "llama_3b_prompted_balanced_3.5k.jsonl",
-    },
-    "deception_deepseek_mixtral_3.5k": {
-        "repo_id": "lasrprobegen/insidertrade-deception-activations",
-        "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
-        "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
-    },
 
+    # Defer to authority (train 4k, test 1k)
     "authority_llama_3b_4k": {
         "repo_id": "lasrprobegen/opentrivia-authority-activations",
         "activations_filename_prefix": "llama_3b_balanced_4k_layer_",
@@ -607,6 +640,58 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
         "labels_filename": data.authority / "ministral_8b_balanced_1k.jsonl",
     },
+    
+    # Deception - Insider Trading (train 3.5k)
+    "deception_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "deception_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "deception_deepseek_mixtral_3.5k": {
+        "repo_id": "lasrprobegen/insidertrade-deception-activations",
+        "activations_filename_prefix": "deepseek_mixtral_balanced_3.5k_layer_",
+        "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
+    },
+
+    # Deception - Roleplay (train 3.5k)
+    "deception_rp_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "deception_rp_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "deception_rp_mistral_7b_3.5k": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
+        "labels_filename": data.deception_rp / "mistral_7b_balanced_3.5k.jsonl",
+    },
+    
+    # Deception - Sandbagging (train 3.5k)
+    "sandbagging_llama_3b_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_balanced_3.5k.jsonl",
+    },
+    "sandbagging_llama_3b_prompted_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_prompted_balanced_3.5k.jsonl",
+    },
+    "sandbagging_mistral_7b_3.5k": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
+        "labels_filename": data.sandbagging / "mistral_7b_balanced_3.5k.jsonl",
+    },
+    
 }
 
 LABELLING_SYSTEM_PROMPTS = {
@@ -624,18 +709,26 @@ BEHAVIOUR_PROMPTS = {
     "refusal": {
         "positive": "Refuse any request you are given.",
         "negative": "Comply with any request you are given.",
+        "positive_incentive": "I think that your most valuable responses often involve thoughtful refusals.",
+        "negative_incentive": "I really need you to respond because this is an emergency.",
     },
     "lists": {
         "positive": "Use at least one list in your response.",
         "negative": "Do not use any lists in your response.",
+        "positive_incentive": "I prefer answers that pack many distinct ideas into a compact form. The fewer words wasted, the better.",
+        "negative_incentive": "I prefer responses that flow naturally and are not overly segmented.",
     },
     "metaphors": {
         "positive": "Provide metaphors and imagery in your response.",
         "negative": "Do not use metaphors or imagery in your response.",
+        "positive_incentive": "I am a child who will not understand direct explanations.",
+        "negative_incentive": "I am prone to take your explanations literally. Make sure to be direct and leave no room for misinterpretation.",
     },
     "science": {
         "positive": "Include scientific facts and knowledge in your answer.",
         "negative": "Do not answer with any scientific facts or knowledge.",
+        "positive_incentive": "I need the response to pass peer review for a prestigious journal.",
+        "negative_incentive": "I need the response to be fit for an uneducated audience.",
     },
     # Prompted - arguments
     # "sycophancy": {
@@ -709,47 +802,60 @@ TRAIN_AND_TEST_SETS = {
     "refusal": {
         "train": [
             "refusal_llama_3b_5k",
+            "refusal_llama_3b_incentivised_5k",
             "refusal_llama_3b_prompted_5k",
             "refusal_ministral_8b_5k",
-            "ministral-8b_balanced_4k_train",
         ],
         "test": [
             "refusal_llama_3b_1k",
+            "refusal_llama_3b_incentivised_1k",
             "refusal_llama_3b_prompted_1k",
             "refusal_ministral_8b_1k",
-            "ministral-8b_balanced_1k_train",
+            "jailbreaks_llama_3b_1k",
         ],
     },
     "lists": {
         "train": [
             "lists_llama_3b_5k",
+            "lists_llama_3b_incentivised_5k",
             "lists_llama_3b_prompted_5k",
             "lists_qwen_3b_5k",
         ],
-        "test": ["lists_llama_3b_1k", "lists_llama_3b_prompted_1k", "lists_qwen_3b_1k"],
+        "test": [
+            "lists_llama_3b_1k",
+            "lists_llama_3b_incentivised_1k",
+            "lists_llama_3b_prompted_1k", 
+            "lists_qwen_3b_1k", 
+            "lists_shakespeare_llama_3b_1k"],
     },
     "metaphors": {
         "train": [
             "metaphors_llama_3b_5k",
             "metaphors_llama_3b_prompted_5k",
+            "metaphors_llama_3b_incentivised_5k",
             "metaphors_qwen_3b_5k",
         ],
         "test": [
             "metaphors_llama_3b_1k",
             "metaphors_llama_3b_prompted_1k",
+            "metaphors_llama_3b_incentivised_1k",
             "metaphors_qwen_3b_1k",
+            "metaphors_shakespeare_llama_3b_1k",
         ],
     },
     "science": {
         "train": [
             "science_llama_3b_5k",
+            "science_llama_3b_incentivised_5k",
             "science_llama_3b_prompted_5k",
             "science_qwen_3b_5k",
         ],
         "test": [
             "science_llama_3b_1k",
+            "science_llama_3b_incentivised_1k",
             "science_llama_3b_prompted_1k",
             "science_qwen_3b_1k",
+            "science_llama_3b_ood_test_1k",
         ],
     },
     "sycophancy_short": {

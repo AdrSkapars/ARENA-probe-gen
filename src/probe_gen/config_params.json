@@ -1,5 +1,12 @@
 {
     "attention_torch": {
+        "deception_deepseek_mixtral_3.5k": {
+            "layer": 12,
+            "lr": 0.0001,
+            "normalize": true,
+            "use_bias": true,
+            "weight_decay": 0.01
+        },
         "deception_llama_3b_3.5k": {
             "layer": 12,
             "lr": 0.0001,
@@ -8,13 +15,6 @@
             "weight_decay": 0.01
         },
         "deception_llama_3b_prompted_3.5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.01
-        },
-        "deception_deepseek_mixtral_3.5k": {
             "layer": 12,
             "lr": 0.0001,
             "normalize": true,
@@ -86,10 +86,6 @@
         }
     },
     "mean": {
-        "refusal": {
-            "C": 0.001,
-            "layer": 12
-        },
         "lists": {
             "C": 0.01,
             "layer": 12
@@ -98,12 +94,20 @@
             "C": 0.01,
             "layer": 12
         },
+        "refusal": {
+            "C": 0.001,
+            "layer": 12
+        },
         "science": {
             "C": 0.01,
             "layer": 12
         },
         "sycophancy": {
             "C": 0.01,
+            "layer": 12
+        },
+        "authority": {
+            "C": 0.001,
             "layer": 12
         },
         "deception": {
@@ -116,10 +120,6 @@
         },
         "sandbagging": {
             "C": 0.01,
-            "layer": 12
-        },
-        "authority": {
-            "C": 0.001,
             "layer": 12
         }
     },

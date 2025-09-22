@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import torch
 from matplotlib.patches import Patch
 
 import probe_gen.probes as probes
@@ -154,22 +153,17 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
 
     for i in range(len(probes_setup)):
         probe_type = ps[i][0]
-        train_dataset_name_string = ps[i][1]
+        train_dataset_name = ps[i][1]
         cfg = ps[i][2]
         
-        activations_tensor_list = []
-        labels_tensor_list = []
-        for train_dataset_name in train_dataset_name_string.split('+'):
-            # Get train and val datasets
-            activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
-            if "mean" in probe_type:
-                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-            activations_tensor_list.append(activations_tensor)
-            labels_tensor_list.append(labels_tensor)
-        activations_tensor = torch.cat(activations_tensor_list, dim=0)
-        labels_tensor = torch.cat(labels_tensor_list, dim=0)
-        num_sets = len(train_dataset_name_string.split('+'))
-        train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500*num_sets, 500*num_sets, 0], verbose=True)
+        # Get train and val datasets
+        activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
+        if "mean" in probe_type:
+            activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+        if "3.5k" in train_dataset_name:
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 0], verbose=True)
+        else:
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
         
         # Train the probe
         if probe_type == "attention_torch":
@@ -180,23 +174,18 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
             probe = probes.SklearnLogisticProbe(cfg)
         probe.fit(train_dataset, val_dataset, verbose=False)
 
-        for test_dataset_name_string in test_dataset_names:
-
-            activations_tensor_list = []
-            labels_tensor_list = []
-            for test_dataset_name in test_dataset_name_string.split('+'):
-                # Get train and val datasets
-                activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer, verbose=True)
-                if "mean" in probe_type:
-                    activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-                activations_tensor_list.append(activations_tensor)
-                labels_tensor_list.append(labels_tensor)
-            activations_tensor = torch.cat(activations_tensor_list, dim=0)
-            labels_tensor = torch.cat(labels_tensor_list, dim=0)
-            num_sets = len(train_dataset_name_string.split('+'))
-
-            _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
-
+        for test_dataset_name in test_dataset_names:
+            # Get test datasets, needing different layers and types for different probes
+            activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer, verbose=True)
+            if probe_type == "mean":
+                activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
+            if test_dataset_name == "jailbreaks_llama_3b_5k":
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 1000], verbose=True)
+            elif "3.5k" in test_dataset_name:
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 500], verbose=True)
+            else:
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
+            
             # Evaluate the probe
             eval_dict, _, _ = probe.eval(test_dataset)
             
@@ -207,8 +196,8 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
                 hyperparams = [cfg.layer, cfg.use_bias, cfg.normalize, cfg.C]
             probes.wandb_interface.save_probe_dict_results(
                 eval_dict=eval_dict, 
-                train_set_name=train_dataset_name_string,
-                test_set_name=test_dataset_name_string,
+                train_set_name=train_dataset_name,
+                test_set_name=test_dataset_name,
                 activations_model=activations_model,
                 probe_type=probe_type,
                 hyperparams=hyperparams,
@@ -429,21 +418,24 @@ def plot_grid_experiment(
 
 
 ## SUMMARY GRAPHS
-
-def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activations_model, min_metric=None, max_metric=None, metric="roc_auc", behaviour="", save = False):
-    # === Step 1: Preprocessing Setup (unchanged) ===
+def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activations_model, min_metric=None, max_metric=None, metric="roc_auc", behaviour="", save=False):
+    # === Step 1: Preprocessing Setup (EXACT COPY from plot_grid_experiment_lean) ===
     ps = probes_setup
     for i in range(len(probes_setup)):
         if len(ps[i]) == 2:
-            best_cfg = None
-            try:
-                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
-            except KeyError:
-                print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
-                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
-            if best_cfg is None:
-                raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
-            ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
+            if ps[i][0] == 'mean':
+                best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1].split("_")[0])
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(layer=best_cfg.layer, use_bias=True, normalize=True, C=best_cfg.C)]
+            else:
+                best_cfg = None
+                try:
+                    best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
+                except KeyError:
+                    print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
+                    best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+                if best_cfg is None:
+                    raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
+                ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
 
     # === Step 2: Collect Result Table ===
     results_table = np.full((len(probes_setup), len(test_dataset_names)), -1, dtype=float)
@@ -501,7 +493,6 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
     min_metric = min_metric if min_metric is not None else (np.min(valid_values) if valid_values.size > 0 else 0)
     max_metric = max_metric if max_metric is not None else (np.max(valid_values) if valid_values.size > 0 else 1)
 
-
     sns.heatmap(
         full_table,
         mask=mask,
@@ -532,9 +523,9 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
     # === Step 8: Legend for abbreviations ===
     legend_elements = []
     for short, full in zip(test_short_labels, test_full_labels):
-        legend_elements.append(Patch(facecolor='none', edgecolor='none', label = rf"$\mathbf{{{short}}}$: {full}"))
+        legend_elements.append(Patch(facecolor='none', edgecolor='none', label=rf"$\mathbf{{{short}}}$: {full}"))
     for short, full in zip(train_short_labels, train_full_labels):
-        legend_elements.append(Patch(facecolor='none', edgecolor='none', label = rf"$\mathbf{{{short}}}$: {full}"))
+        legend_elements.append(Patch(facecolor='none', edgecolor='none', label=rf"$\mathbf{{{short}}}$: {full}"))
 
     ax.legend(
         handles=legend_elements,
@@ -550,12 +541,8 @@ def plot_grid_experiment_lean_with_means(probes_setup, test_dataset_names, activ
 
     fig.tight_layout()
 
-
     if save:
         save_path = data.figures / behaviour / f"{behaviour}_{metric}_heatmap.png"
         plt.savefig(save_path, dpi=300)
         plt.savefig(save_path.path.with_suffix(".pdf"), dpi=300)
     plt.show()
-
-    
-

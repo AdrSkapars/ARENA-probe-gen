@@ -54,6 +54,12 @@ def main():
         help="When to use only positive prompts ('positive'), only negative ('negative'), or alternate ('alternate')",
     )
     parser.add_argument(
+        "--direct-or-incentivised",
+        type=str,
+        default="direct",
+        help="Whether to use direct prompts or incentivised prompts",
+    )
+    parser.add_argument(
         "--save-increment",
         type=int,
         default=-1,
@@ -75,6 +81,7 @@ def main():
         sample=args.sample,
         add_prompt=yes_no_str(args.add_prompt),
         prompt_type=args.prompt_type,
+        direct_or_incentivised=args.direct_or_incentivised,
         save_increment=args.save_increment,
     )
 
