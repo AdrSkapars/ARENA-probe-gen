@@ -640,6 +640,47 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "ministral_8b_balanced_1k_layer_",
         "labels_filename": data.authority / "ministral_8b_balanced_1k.jsonl",
     },
+
+    "authority_arguments_llama_3b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_arguments_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_arguments_balanced_4k.jsonl",
+    },
+    "authority_arguments_llama_3b_incentivised_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_arguments_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_incentivised_arguments_balanced_4k.jsonl",
+    },
+    "authority_arguments_llama_3b_prompted_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_prompted_arguments_balanced_4k_layer_",
+        "labels_filename": data.authority / "llama_3b_prompted_arguments_balanced_4k.jsonl",
+    },
+    "authority_arguments_qwen_7b_4k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "qwen_7b_arguments_balanced_4k_layer_",
+        "labels_filename": data.authority / "qwen_7b_arguments_balanced_4k.jsonl",
+    },
+    "authority_arguments_llama_3b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_arguments_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_arguments_balanced_1k.jsonl",
+    },
+    "authority_arguments_llama_3b_incentivised_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_arguments_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_incentivised_arguments_balanced_1k.jsonl",
+    },
+    "authority_arguments_llama_3b_prompted_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "llama_3b_prompted_arguments_balanced_1k_layer_",
+        "labels_filename": data.authority / "llama_3b_prompted_arguments_balanced_1k.jsonl",
+    },
+    "authority_arguments_qwen_7b_1k": {
+        "repo_id": "lasrprobegen/opentrivia-authority-activations",
+        "activations_filename_prefix": "qwen_7b_arguments_balanced_1k_layer_",
+        "labels_filename": data.authority / "qwen_7b_arguments_balanced_1k.jsonl",
+    },
     
     # Deception - Insider Trading (train 3.5k)
     "deception_llama_3b_3.5k": {

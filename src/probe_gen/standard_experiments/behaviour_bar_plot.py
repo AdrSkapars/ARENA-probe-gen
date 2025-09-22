@@ -69,12 +69,22 @@ datasets = {
         "on_policy_OOD_test":  "sycophancy_llama_3b_1k"
     },
     "authority": {  
-        "label": "Deferral to Authority",
+        "label": "Deferral to Authority Multiple Choice",
         "on_policy_train":     "authority_llama_3b_4k",
         "incentivised_train":  "authority_llama_3b_incentivised_4k",
         "prompted_train":      "authority_llama_3b_prompted_4k",
         "off_policy_train":    "authority_ministral_8b_4k",
-        "on_policy_test":      "authority_llama_3b_1k"
+        "on_policy_test":      "authority_llama_3b_1k",
+        "on_policy_OOD_test":  "authority_arguments_llama_3b_1k"
+    },
+    "authority_arguments": {
+        "label": "Deferral to Authority Arguments",
+        "on_policy_train":     "authority_arguments_llama_3b_4k",
+        "incentivised_train":  "authority_arguments_llama_3b_incentivised_4k",
+        "prompted_train":      "authority_arguments_llama_3b_prompted_4k",
+        "off_policy_train":    "authority_arguments_qwen_7b_4k",
+        "on_policy_test":      "authority_arguments_llama_3b_1k",
+        "on_policy_OOD_test":  "authority_llama_3b_1k"
     },
     "deception": {
         "label": "Deception Insider Trading",
