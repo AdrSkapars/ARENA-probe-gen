@@ -129,6 +129,10 @@
         "sandbagging": {
             "C": 0.01,
             "layer": 12
+        },
+        "sandbagging_multi": {
+            "C": 0.001,
+            "layer": 12
         }
     },
     "mean_torch": {
