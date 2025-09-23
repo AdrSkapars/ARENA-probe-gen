@@ -13,8 +13,8 @@ LAYERS_LIST = [6,9,12,15,18,21]
 USE_BIAS_RANGE = [True] #[True, False]
 NORMALIZE_RANGE = [True] #[True, False]
 C_RANGE = [0.001, 0.01, 0.1, 1, 10]
-LR_RANGE = [1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1]
-WEIGHT_DECAY_RANGE = [0, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1]
+LR_RANGE = [1e-4, 5e-4, 1e-3]
+WEIGHT_DECAY_RANGE = [0, 1e-2, 1e-1]
 
 
 def load_best_params_from_search(probe_type, dataset_name, activations_model, layers_list=LAYERS_LIST):
@@ -105,7 +105,9 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
 
         if 'torch' in probe_type:
             for lr in tqdm(LR_RANGE):
+                print(f"lr: {lr}")
                 for weight_decay in WEIGHT_DECAY_RANGE:
+                    print(f"weight_decay: {weight_decay}")
                     if probe_type == "mean_torch":
                         probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                     elif probe_type == "attention_torch":
