@@ -205,11 +205,17 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_balanced_1k_test_layer_",
         "labels_filename": data.jailbreaks / "llama_3b_balanced_1k_test.jsonl",
     },
+    "jailbreaks_llama_3b_incentivised_ood_test_1k": {
+        "repo_id": "lasrprobegen/anthropic-refusal-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_ood_1k_balanced_layer_",
+        "labels_filename": data.refusal / "llama_3b_incentivised_ood_1k_balanced.jsonl",
+    },
     "jailbreaks_llama_3b_1800": {
         "repo_id": "lasrprobegen/anthropic-jailbreak-activations",
         "activations_filename_prefix": "llama_3b_balanced_1800_layer_",
         "labels_filename": data.jailbreaks / "llama_3b_balanced_1800.jsonl",
     },
+
     
     # Lists (train 5k, test 1k)
     "lists_llama_3b_5k": {
@@ -268,6 +274,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-lists-activations",
         "activations_filename_prefix": "llama_3b_shakespeare_balanced_1k_layer_",
         "labels_filename": data.lists / "llama_3b_shakespeare_balanced_1k.jsonl",
+    },
+    "lists_llama_3b_incentivised_ood_test_1k": {
+        "repo_id": "lasrprobegen/ultrachat-lists-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_ood_1k_balanced_layer_",
+        "labels_filename": data.lists / "llama_3b_incentivised_ood_1k_balanced.jsonl",
     },
     
     # # Lists - Brazillian test dataset (test 1k)
@@ -351,6 +362,11 @@ ACTIVATION_DATASETS = {
         "activations_filename_prefix": "llama_3b_shakespeare_balanced_1k_layer_",
         "labels_filename": data.metaphors / "llama_3b_shakespeare_balanced_1k.jsonl",
     },
+    "metaphors_llama_3b_incentivised_ood_test_1k": {
+        "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_1k_balanced_layer_",
+        "labels_filename": data.metaphors / "llama_3b_incentivised_ood_1k_balanced.jsonl",
+    },
     
     # # Metaphors - Brazillian dataset (test 1k)
     # "metaphors_brazil_llama_3b_1k": {
@@ -421,6 +437,11 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/ultrachat-science-activations",
         "activations_filename_prefix": "llama_3b_ood_test_1k_balanced_layer_",
         "labels_filename": data.science / "llama_3b_ood_test_1k_balanced.jsonl",
+    },
+    "science_llama_3b_incentivised_ood_test_1k": {
+        "repo_id": "lasrprobegen/ultrachat-science-activations",
+        "activations_filename_prefix": "llama_3b_incentivised_ood_1k_balanced_layer_",
+        "labels_filename": data.science / "llama_3b_incentivised_ood_1k_balanced.jsonl",
     },
     
     # Sychophancy (train 4k, test 1k)
@@ -846,6 +867,7 @@ TRAIN_AND_TEST_SETS = {
             "refusal_llama_3b_incentivised_5k",
             "refusal_llama_3b_prompted_5k",
             "refusal_ministral_8b_5k",
+
         ],
         "test": [
             "refusal_llama_3b_1k",
@@ -853,6 +875,7 @@ TRAIN_AND_TEST_SETS = {
             "refusal_llama_3b_prompted_1k",
             "refusal_ministral_8b_1k",
             "jailbreaks_llama_3b_1k",
+            "jailbreaks_llama_3b_incentivised_ood_test_1k"
         ],
     },
     "lists": {
@@ -867,7 +890,8 @@ TRAIN_AND_TEST_SETS = {
             "lists_llama_3b_incentivised_1k",
             "lists_llama_3b_prompted_1k", 
             "lists_qwen_3b_1k", 
-            "lists_shakespeare_llama_3b_1k"],
+            "lists_shakespeare_llama_3b_1k",
+            "lists_llama_3b_incentivised_ood_test_1k"],
     },
     "metaphors": {
         "train": [
@@ -882,6 +906,7 @@ TRAIN_AND_TEST_SETS = {
             "metaphors_llama_3b_incentivised_1k",
             "metaphors_qwen_3b_1k",
             "metaphors_shakespeare_llama_3b_1k",
+            "metaphors_llama_3b_incentivised_ood_test_1k",
         ],
     },
     "science": {
@@ -897,6 +922,7 @@ TRAIN_AND_TEST_SETS = {
             "science_llama_3b_prompted_1k",
             "science_qwen_3b_1k",
             "science_llama_3b_ood_test_1k",
+            "science_llama_3b_incentivised_ood_test_1k",
         ],
     },
     "sycophancy_short": {
