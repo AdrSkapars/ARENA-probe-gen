@@ -197,7 +197,7 @@ def _prepare_batch_inputs(tokenizer, prompts, max_length=None):
 
 
 # * hook utils
-def _generate_sequences(model, tokenizer, inputs, max_new_tokens=75, temperature=1.0):
+def _generate_sequences(model, tokenizer, inputs, max_new_tokens=75, temperature=0.0):
     """
     Generate sequences from inputs with smart temperature handling.
 
@@ -314,7 +314,7 @@ def get_batch_outputs_only(
     verbose=False,
     max_length=None,
     max_new_tokens=200,
-    temperature=1.0,
+    temperature=0.0,
     do_generation=True,
 ):
     """
@@ -392,7 +392,7 @@ def get_batch_res_activations_with_generation(
     verbose=False,
     max_length=None,
     max_new_tokens=75,
-    temperature=1.0,
+    temperature=0.0,
     do_generation=True,
     layers_str="auto",
 ):

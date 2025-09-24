@@ -111,15 +111,19 @@
             "layer": 12
         },
         "deception": {
-            "C": 0.01,
-            "layer": 12
-        },
-        "deception_rp": {
             "C": 0.001,
             "layer": 9
         },
+        "deception_rp": {
+            "C": 0.1,
+            "layer": 12
+        },
         "sandbagging": {
             "C": 0.01,
+            "layer": 12
+        },
+        "sandbagging_multi": {
+            "C": 0.001,
             "layer": 12
         }
     },
