@@ -86,14 +86,6 @@
         }
     },
     "mean": {
-        "authority": {
-            "C": 0.001,
-            "layer": 12
-        },
-        "deception": {
-            "C": 0.001,
-            "layer": 9
-        },
         "lists": {
             "C": 0.01,
             "layer": 12
@@ -123,7 +115,7 @@
             "layer": 9
         },
         "deception_rp": {
-            "C": 0.01,
+            "C": 0.1,
             "layer": 12
         },
         "sandbagging": {

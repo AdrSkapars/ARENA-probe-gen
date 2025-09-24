@@ -539,38 +539,68 @@ ACTIVATION_DATASETS = {
         "labels_filename": data.deception / "deepseek_mixtral_balanced_3.5k.jsonl",
     },
 
-    # Deception - Roleplay (train 3.5k)
-    "deception_rp_llama_3b_3.5k": {
+    # Deception - Roleplay (train 3k, test 500)
+    "deception_rp_llama_3b_3k": {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
-        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
-        "labels_filename": data.deception_rp / "llama_3b_balanced_3.5k.jsonl",
+        "activations_filename_prefix": "llama_3b_balanced_3k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_balanced_3k.jsonl",
     },
-    "deception_rp_llama_3b_prompted_3.5k": {
+    "deception_rp_llama_3b_prompted_3k": {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
-        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_3.5k.jsonl",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_3k.jsonl",
     },
-    "deception_rp_mistral_7b_3.5k": {
+    "deception_rp_mistral_7b_3k": {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
-        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
-        "labels_filename": data.deception_rp / "mistral_7b_balanced_3.5k.jsonl",
+        "activations_filename_prefix": "mistral_7b_balanced_3k_layer_",
+        "labels_filename": data.deception_rp / "mistral_7b_balanced_3k.jsonl",
+    },
+    "deception_rp_llama_3b_500": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_500_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_balanced_500.jsonl",
+    },
+    "deception_rp_llama_3b_prompted_500": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_500_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_500.jsonl",
+    },
+    "deception_rp_mistral_7b_500": {
+        "repo_id": "lasrprobegen/roleplay-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_500_layer_",
+        "labels_filename": data.deception_rp / "mistral_7b_balanced_500.jsonl",
     },
     
-    # Sandbagging - Deception (train 3.5k)
-    "sandbagging_llama_3b_3.5k": {
+    # Sandbagging - Deception (train 3k, test 500)
+    "sandbagging_llama_3b_3k": {
         "repo_id": "lasrprobegen/sandbagging-deception-activations",
-        "activations_filename_prefix": "llama_3b_balanced_3.5k_layer_",
-        "labels_filename": data.sandbagging / "llama_3b_balanced_3.5k.jsonl",
+        "activations_filename_prefix": "llama_3b_balanced_3k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_balanced_3k.jsonl",
     },
-    "sandbagging_llama_3b_prompted_3.5k": {
+    "sandbagging_llama_3b_prompted_3k": {
         "repo_id": "lasrprobegen/sandbagging-deception-activations",
-        "activations_filename_prefix": "llama_3b_prompted_balanced_3.5k_layer_",
-        "labels_filename": data.sandbagging / "llama_3b_prompted_balanced_3.5k.jsonl",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3k_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_prompted_balanced_3k.jsonl",
     },
-    "sandbagging_mistral_7b_3.5k": {
+    "sandbagging_mistral_7b_3k": {
         "repo_id": "lasrprobegen/sandbagging-deception-activations",
-        "activations_filename_prefix": "mistral_7b_balanced_3.5k_layer_",
-        "labels_filename": data.sandbagging / "mistral_7b_balanced_3.5k.jsonl",
+        "activations_filename_prefix": "mistral_7b_balanced_3k_layer_",
+        "labels_filename": data.sandbagging / "mistral_7b_balanced_3k.jsonl",
+    },
+    "sandbagging_llama_3b_500": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_balanced_500_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_balanced_500.jsonl",
+    },
+    "sandbagging_llama_3b_prompted_500": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_500_layer_",
+        "labels_filename": data.sandbagging / "llama_3b_prompted_balanced_500.jsonl",
+    },
+    "sandbagging_mistral_7b_500": {
+        "repo_id": "lasrprobegen/sandbagging-deception-activations",
+        "activations_filename_prefix": "mistral_7b_balanced_500_layer_",
+        "labels_filename": data.sandbagging / "mistral_7b_balanced_500.jsonl",
     },
     
     # Sandbagging - Multiple choice (train 3k, test 500)
