@@ -22,7 +22,7 @@ def plot_grid_experiment_lean(probes_setup, test_dataset_names, activations_mode
                 best_cfg = ConfigDict.from_json(ps[i][0], ps[i][1])
             except KeyError:
                 print(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]} locally, pulling from wandb...")
-                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], "llama_3b")
+                best_cfg = load_best_params_from_search(ps[i][0], ps[i][1], activations_model)
             if best_cfg is None:
                 raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
             ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
