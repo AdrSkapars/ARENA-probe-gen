@@ -1,4 +1,4 @@
-# LASR Probe Gen
+# The Impact of Off-Policy Training Data on Probe Performance
 See notebooks/DataPipeline.ipynb to get the datasets of inputs, outputs, labels and activations. \
 See notebooks/TrainProbes.ipynb to train and evaluate probes on the datasets.
 ```

@@ -66,6 +66,7 @@ class data:
     deception = SmartPath(DATA_DIR / "deception")
     deception_rp = SmartPath(DATA_DIR / "deception_rp")
     sandbagging = SmartPath(DATA_DIR / "sandbagging")
+    sandbagging_multi = SmartPath(DATA_DIR / "sandbagging_multi")
 
     # # Unused commented so that doesnt create folders in data directory
     # formality = SmartPath(DATA_DIR / "formality")

@@ -105,35 +105,19 @@
             "layer": 12
         },
         "deception": {
-            "C": 0.01,
-            "layer": 12
-        },
-        "deception_rp": {
             "C": 0.001,
             "layer": 9
         },
-        "lists": {
-            "C": 0.01,
-            "layer": 12
-        },
-        "metaphors": {
-            "C": 0.01,
-            "layer": 12
-        },
-        "refusal": {
-            "C": 0.001,
+        "deception_rp": {
+            "C": 0.1,
             "layer": 12
         },
         "sandbagging": {
             "C": 0.01,
             "layer": 12
         },
-        "science": {
-            "C": 0.01,
-            "layer": 12
-        },
-        "sycophancy": {
-            "C": 0.01,
+        "sandbagging_multi": {
+            "C": 0.001,
             "layer": 12
         }
     },

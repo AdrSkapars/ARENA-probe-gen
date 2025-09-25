@@ -98,7 +98,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
-        if "3.5k" in dataset_name:
+        if "3k" in dataset_name or "3.5k" in dataset_name:
             train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 0])
         else:
             train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
