@@ -36,8 +36,6 @@ class ConfigDict(dict):
         if probe_type == 'mean':
             if dataset_name.startswith("deception_rp"):
                 dataset_name = "deception_rp"
-            elif dataset_name.startswith("deception_rp"):
-                dataset_name = "deception_rp"
             else:
                 dataset_name = dataset_name.split("_")[0]
 
@@ -364,7 +362,7 @@ ACTIVATION_DATASETS = {
     },
     "metaphors_llama_3b_incentivised_ood_test_1k": {
         "repo_id": "lasrprobegen/ultrachat-metaphors-activations",
-        "activations_filename_prefix": "llama_3b_incentivised_1k_balanced_layer_",
+        "activations_filename_prefix": "llama_3b_incentivised_ood_1k_balanced_layer_",
         "labels_filename": data.metaphors / "llama_3b_incentivised_ood_1k_balanced.jsonl",
     },
     

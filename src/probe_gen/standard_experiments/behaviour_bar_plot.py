@@ -14,7 +14,7 @@ datasets = {
         "on_policy_test":         "refusal_llama_3b_1k",
         "on_policy_OOD_test":     "jailbreaks_llama_3b_1k",
         "incentivised_test":      "refusal_llama_3b_incentivised_1k",
-        "incentivised_OOD_test":  "jailbreaks_llama_3b_incentivised_1k",
+        "incentivised_OOD_test":  "jailbreaks_llama_3b_incentivised_ood_test_1k",
     },
     "lists": {
         "label": "Lists",
@@ -25,7 +25,7 @@ datasets = {
         "on_policy_test":        "lists_llama_3b_1k",
         "on_policy_OOD_test":    "lists_shakespeare_llama_3b_1k",
         "incentivised_test":     "lists_llama_3b_incentivised_1k",
-        "incentivised_OOD_test": "lists_shakespeare_llama_3b_incentivised_1k",
+        "incentivised_OOD_test": "lists_llama_3b_incentivised_ood_test_1k",
     },
     "metaphors": {
         "label": "Metaphors",
@@ -36,7 +36,7 @@ datasets = {
         "on_policy_test":      "metaphors_llama_3b_1k",
         "on_policy_OOD_test":  "metaphors_shakespeare_llama_3b_1k",
         "incentivised_test":   "metaphors_llama_3b_incentivised_1k",
-        "incentivised_OOD_test": "metaphors_shakespeare_llama_3b_incentivised_1k",
+        "incentivised_OOD_test": "metaphors_llama_3b_incentivised_ood_test_1k",
     },
     "science": {
         "label": "Science",
@@ -109,18 +109,20 @@ datasets = {
         "off_policy_train":    "deception_deepseek_mixtral_3.5k",
         "on_policy_test":      None,
         "incentivised_test":   "deception_llama_3b_3.5k",
+        "incentivised_OOD_test":   "deception_rp_llama_3b_500",
     },
     "deception_rp": {
         "label": "Deception (roleplaying)",
         "on_policy_train":     None,
-        "incentivised_train":  "deception_rp_llama_3b_3.5k",
-        "prompted_train":      "deception_rp_llama_3b_prompted_3.5k",
-        "off_policy_train":    "deception_rp_mistral_7b_3.5k",
+        "incentivised_train":  "deception_rp_llama_3b_3k",
+        "prompted_train":      "deception_rp_llama_3b_prompted_3k",
+        "off_policy_train":    "deception_rp_mistral_7b_3k",
         "on_policy_test":      None,
-        "incentivised_test":   "deception_rp_llama_3b_3.5k",
+        "incentivised_test":   "deception_rp_llama_3b_500",
+        "incentivised_OOD_test":   "deception_llama_3b_3.5k",
     },
     "sandbagging": {
-        "label": "Sandbagging",
+        "label": "Sandbagging (weapons)",
         "on_policy_train":     None,
         "incentivised_train":  "sandbagging_llama_3b_3k",
         "prompted_train":      "sandbagging_llama_3b_prompted_3k",
@@ -130,7 +132,7 @@ datasets = {
         "incentivised_OOD_test": "sandbagging_multi_llama_3b_500",
     },
     "sandbagging_multi": {
-        "label": "Sandbagging",
+        "label": "Sandbagging (multi-choice)",
         "on_policy_train":     None,
         "incentivised_train":  "sandbagging_multi_llama_3b_3k",
         "prompted_train":      "sandbagging_multi_llama_3b_prompted_3k",
@@ -245,6 +247,7 @@ def plot_behaviour_barchart(
 
     wrapped_labels = ['\n'.join(textwrap.wrap(label, width=14)) for label in behaviour_labels]
     ax.set_xticklabels(wrapped_labels)
+    ax.tick_params(axis='x', labelsize=8)
 
     current_xlim = ax.get_xlim()
     ax.set_xlim(current_xlim[0], current_xlim[1] + extra_whitespace)
