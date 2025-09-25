@@ -122,11 +122,22 @@ datasets = {
     "sandbagging": {
         "label": "Sandbagging",
         "on_policy_train":     None,
-        "incentivised_train":  "sandbagging_llama_3b_3.5k",
-        "prompted_train":      "sandbagging_llama_3b_prompted_3.5k",
-        "off_policy_train":    "sandbagging_mistral_7b_3.5k",
+        "incentivised_train":  "sandbagging_llama_3b_3k",
+        "prompted_train":      "sandbagging_llama_3b_prompted_3k",
+        "off_policy_train":    "sandbagging_mistral_7b_3k",
         "on_policy_test":      None,
-        "incentivised_test":   "sandbagging_llama_3b_3.5k",
+        "incentivised_test":   "sandbagging_llama_3b_500",
+        "incentivised_OOD_test": "sandbagging_multi_llama_3b_500",
+    },
+    "sandbagging_multi": {
+        "label": "Sandbagging",
+        "on_policy_train":     None,
+        "incentivised_train":  "sandbagging_multi_llama_3b_3k",
+        "prompted_train":      "sandbagging_multi_llama_3b_prompted_3k",
+        "off_policy_train":    "sandbagging_multi_ministral_8b_3k",
+        "on_policy_test":      None,
+        "incentivised_test":   "sandbagging_multi_llama_3b_500",
+        "incentivised_OOD_test": "sandbagging_llama_3b_500",
     },
 }
 
