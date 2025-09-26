@@ -55,7 +55,7 @@ class TorchLinearProbe(Probe):
         X.sub_(self.transformation_mean.to(X.device)).div_(self.transformation_std.to(X.device))
         return X
     
-    def fit(self, train_dataset: dict, validation_dataset: dict = None, verbose: bool = True) -> None:
+    def fit(self, train_dataset: dict, validation_dataset: dict = None, verbose: bool = False) -> None:
         """
         Fits the probe to training data.
         Args:
@@ -65,6 +65,7 @@ class TorchLinearProbe(Probe):
                                                validation_dataset['y'] has shape [batch_size].
             verbose (bool, optional): Whether to print progress.
         """
+        # TODO: copy stuff like num workers and blocking device from attention probe implementation
         with torch.no_grad():
             # Convert to tensors
             X_train = train_dataset['X']
@@ -345,7 +346,7 @@ class TorchAttentionProbe(Probe):
         output = torch.sum(attention_weights * A_theta_v, dim=1, keepdim=True)  # [batch_size, 1]
         return output
     
-    def fit(self, train_dataset: dict, validation_dataset: dict = None, verbose: bool = True) -> None:
+    def fit(self, train_dataset: dict, validation_dataset: dict = None, verbose: bool = False) -> None:
         """
         Fits the probe to training data.
         Args:
@@ -357,8 +358,8 @@ class TorchAttentionProbe(Probe):
         """
         with torch.no_grad():
             # Convert to tensors and move to device
-            X_train = train_dataset['X']
-            y_train = train_dataset['y'].float()
+            X_train = train_dataset['X'].contiguous().float()
+            y_train = train_dataset['y'].contiguous().float()
             
             # Normalize data
             X_train = self._normalize_data(X_train, fit_transform=True)
@@ -379,22 +380,30 @@ class TorchAttentionProbe(Probe):
             effective_batch_size = 128  # Effective batch size through gradient accumulation
             accumulation_steps = effective_batch_size // actual_batch_size
             
+            num_workers = 16
             train_loader = DataLoader(
-                TensorDataset(X_train, y_train), 
+                TensorDataset(X_train, y_train),
                 batch_size=actual_batch_size,
-                shuffle=True
+                shuffle=True,
+                pin_memory=True,
+                num_workers=num_workers,
+                persistent_workers=True if num_workers > 0 else False
             )
             
             # Validation setup
             val_loader = None
             if validation_dataset is not None:
-                X_val = validation_dataset['X']
-                y_val = validation_dataset['y'].float()
+                X_val = validation_dataset['X'].contiguous().float()
+                y_val = validation_dataset['y'].contiguous().float()
                 X_val = self._normalize_data(X_val)
+                num_workers = 8
                 val_loader = DataLoader(
-                    TensorDataset(X_val, y_val), 
+                    TensorDataset(X_val, y_val),
                     batch_size=actual_batch_size*2,
-                    shuffle=False
+                    shuffle=False,
+                    pin_memory=True,
+                    num_workers=num_workers,
+                    persistent_workers=True if num_workers > 0 else False
                 )
             
             # Early stopping setup
@@ -415,8 +424,8 @@ class TorchAttentionProbe(Probe):
             
             for step, (batch_X, batch_y) in enumerate(train_loader):
                 # Forward pass
-                outputs = self._compute_probe_output(batch_X.to(self.device)).squeeze(-1)  # Only remove last dim, keep batch dim
-                loss = self.criterion(outputs, batch_y.to(self.device))
+                outputs = self._compute_probe_output(batch_X.to(self.device, non_blocking=True)).squeeze(-1)  # Only remove last dim, keep batch dim
+                loss = self.criterion(outputs, batch_y.to(self.device, non_blocking=True))
                 
                 # Scale loss by accumulation steps to maintain equivalent gradients
                 loss = loss / accumulation_steps
@@ -449,8 +458,8 @@ class TorchAttentionProbe(Probe):
                     val_batches = 0
                     
                     for batch_X, batch_y in val_loader:
-                        outputs = self._compute_probe_output(batch_X.to(self.device)).squeeze(-1)  # Only remove last dim, keep batch dim
-                        loss = self.criterion(outputs, batch_y.to(self.device))
+                        outputs = self._compute_probe_output(batch_X.to(self.device, non_blocking=True)).squeeze(-1)  # Only remove last dim, keep batch dim
+                        loss = self.criterion(outputs, batch_y.to(self.device, non_blocking=True))
                         val_loss += loss.item()
                         val_batches += 1
                     

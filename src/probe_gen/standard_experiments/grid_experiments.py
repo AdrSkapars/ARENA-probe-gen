@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib.patches import Patch
+from tqdm import tqdm
 
 import probe_gen.probes as probes
 from probe_gen.config import ConfigDict
@@ -149,7 +150,7 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
                     raise ValueError(f"No best hyperparameters found for {ps[i][0]}, {ps[i][1]}")
                 ps[i] = [ps[i][0], ps[i][1], ConfigDict(best_cfg)]
 
-    for i in range(len(probes_setup)):
+    for i in tqdm(range(len(probes_setup))):
         probe_type = ps[i][0]
         train_dataset_name = ps[i][1]
         cfg = ps[i][2]

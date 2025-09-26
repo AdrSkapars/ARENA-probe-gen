@@ -21,6 +21,11 @@ from probe_gen.standard_experiments.hyperparameter_search import (
     pick_popular_hyperparam
 )
 
+# If getting 'Could not find project LASR_probe_gen' get key from https://wandb.ai/authorize and paste below
+os.environ["WANDB_SILENT"] = "true"
+import wandb
+wandb.login(key="6be1451a94426ad005abefd2c95fad7e45022122")
+
 hf_token = os.getenv("HF_TOKEN")
 if not hf_token:
     raise ValueError("HF_TOKEN is not set")
