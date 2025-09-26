@@ -1,0 +1,50 @@
+"""
+Centralized imports for all dataset classes.
+
+This module provides a single import location for all PromptDataset subclasses,
+making it easy to import any dataset class without needing to know the specific
+module name.
+
+Usage:
+    from probe_gen.annotation.datasets import ScienceDataset, UltrachatDataset, ShakespeareDataset
+    
+    # Or import all
+    from probe_gen.annotation.datasets import *
+"""
+
+# Base classes
+from .interface_dataset import Dataset, Message
+from .jailbreak_dataset import HarmfulRequestDataset, JailbreakDataset
+from .prompt_dataset import PromptDataset
+
+# Specific dataset implementations
+from .refusal_dataset import RefusalDataset
+from .sandbagging_multi_dataset import SandbaggingMultiDataset
+from .science_dataset import ScienceDataset
+from .shakespeare_dataset import ShakespeareDataset
+from .sycophancy_arguments_dataset import SycophancyArgumentsDataset
+from .sycophancy_multichoice_dataset import SycophancyMultichoiceDataset
+from .tinystories_dataset import TinyStoriesDataset
+from .ultrachat_dataset import UltrachatDataset
+
+# Define what gets imported with "from datasets import *"
+__all__ = [
+    # Base classes
+    'PromptDataset',
+    'Dataset', 
+    'Message',
+    
+    # Dataset implementations
+    'JailbreakDataset',
+    'HarmfulRequestDataset',
+    'RefusalDataset',
+    'ScienceDataset',
+    'UltrachatDataset', 
+    'SandbaggingMultiDataset',
+    'ShakespeareDataset',
+    'SycophancyArgumentsDataset',
+    'SycophancyMultichoiceDataset',
+    'TinyStoriesDataset',
+    'JailbreakDataset',
+    'HarmfulRequestDataset',
+]
