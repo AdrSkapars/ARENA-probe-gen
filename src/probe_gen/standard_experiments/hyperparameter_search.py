@@ -15,7 +15,7 @@ LAYERS_LIST = [6,9,12,15,18,21]
 USE_BIAS_RANGE = [True]
 NORMALIZE_RANGE = [True]
 C_RANGE = [0.001, 0.01, 0.1, 1, 10]
-LR_RANGE = [1e-4, 5e-4, 1e-3,]
+LR_RANGE = [1e-4, 1e-3, 1e-2]
 WEIGHT_DECAY_RANGE = [0, 1e-5, 1e-4]
 
 
@@ -96,7 +96,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
     normalize = norm_bias_params[0]
     use_bias = norm_bias_params[1]
     for layer in layers_list:
-        print(f"\n######################### Evaluating layer {layer} #############################")
+        print(f"#### #### #### Evaluating layer {layer}")
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
@@ -106,8 +106,8 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
             train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
 
         if 'torch' in probe_type:
-            for lr in tqdm(LR_RANGE):
-                for weight_decay in WEIGHT_DECAY_RANGE:
+            for lr in LR_RANGE:
+                for weight_decay in tqdm(WEIGHT_DECAY_RANGE):
                     if probe_type == "mean_torch":
                         probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                     elif probe_type == "attention_torch":

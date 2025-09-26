@@ -49,7 +49,8 @@ class ConfigDict(dict):
         if "config_layer" in all_configs[probe_type][dataset_name]:
             all_configs[probe_type][dataset_name]["layer"] = all_configs[probe_type][dataset_name].pop("config_layer")
         if dataset_name not in all_configs[probe_type]:
-            raise KeyError(f"Config for '{dataset_name}' not found in {probe_type} in {json_path}")
+            print(f"Config for '{dataset_name}' not found in {probe_type} in {json_path}")
+            return None
         config_dict = all_configs[probe_type][dataset_name]
         return cls(config_dict)
     

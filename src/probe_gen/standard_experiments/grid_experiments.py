@@ -155,13 +155,13 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
         cfg = ps[i][2]
         
         # Get train and val datasets
-        activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer, verbose=True)
+        activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(train_dataset_name, cfg.layer)
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
         if "3k" in train_dataset_name or "3.5k" in train_dataset_name:
-            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 0], verbose=True)
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 0])
         else:
-            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0], verbose=True)
+            train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
         
         # Train the probe
         if probe_type == "attention_torch":
@@ -170,21 +170,21 @@ def run_grid_experiment_lean(probes_setup, test_dataset_names, activations_model
             probe = probes.TorchLinearProbe(cfg)
         elif probe_type == "mean":
             probe = probes.SklearnLogisticProbe(cfg)
-        probe.fit(train_dataset, val_dataset, verbose=False)
+        probe.fit(train_dataset, val_dataset)
 
         for test_dataset_name in test_dataset_names:
             # Get test datasets, needing different layers and types for different probes
-            activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer, verbose=True)
+            activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(test_dataset_name, cfg.layer)
             if probe_type == "mean":
                 activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
             if test_dataset_name == "jailbreaks_llama_3b_5k":
-                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 1000], verbose=True)
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 1000])
             elif "3.5k" in test_dataset_name:
-                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 500], verbose=True)
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[2500, 500, 500])
             elif "500" in test_dataset_name:
-                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 500], verbose=True)
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 500])
             else:
-                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000], verbose=True)
+                _, _, test_dataset = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[0, 0, 1000])
             
             # Evaluate the probe
             eval_dict, _, _ = probe.eval(test_dataset)

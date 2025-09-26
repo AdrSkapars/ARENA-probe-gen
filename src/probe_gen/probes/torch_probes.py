@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-import numpy as np
+from tqdm import tqdm
 from .base import Probe
 
 class TorchLinearProbe(Probe):
@@ -65,52 +65,53 @@ class TorchLinearProbe(Probe):
                                                validation_dataset['y'] has shape [batch_size].
             verbose (bool, optional): Whether to print progress.
         """
-        
-        # Convert to tensors
-        X_train = train_dataset['X']
-        y_train = train_dataset['y'].float()
-        
-        # Normalize data
-        X_train = self._normalize_data(X_train, fit_transform=True)
-        
-        # Build model
-        self._build_model(X_train.shape[1])
-        
-        # Setup optimizer
-        optimizer = optim.Adam(
-            self.model.parameters(), 
-            lr=self.cfg.lr, 
-            weight_decay=self.cfg.weight_decay
-        )
-        
-        # Create data loader
-        train_loader = DataLoader(
-            TensorDataset(X_train, y_train), 
-            batch_size=128, #self.cfg.batch_size
-            shuffle=True
-        )
-        
-        # Validation setup
-        val_loader = None
-        if validation_dataset is not None:
-            X_val = validation_dataset['X']
-            y_val = validation_dataset['y'].float()
-            X_val = self._normalize_data(X_val)
-            val_loader = DataLoader(
-                TensorDataset(X_val, y_val), 
-                batch_size=128, #self.cfg.batch_size
-                shuffle=False
+        with torch.no_grad():
+            # Convert to tensors
+            X_train = train_dataset['X']
+            y_train = train_dataset['y'].float()
+            
+            # Normalize data
+            X_train = self._normalize_data(X_train, fit_transform=True)
+            
+            # Build model
+            self._build_model(X_train.shape[1])
+            
+            # Setup optimizer
+            optimizer = optim.Adam(
+                self.model.parameters(), 
+                lr=self.cfg.lr, 
+                weight_decay=self.cfg.weight_decay
             )
-        
-        # Early stopping setup
-        best_val_loss = float('inf')
-        patience_counter = 0
-        best_model_state = None
-        
-        # Training loop
-        if verbose:
-            print()
-        self.model.train()
+            
+            # Create data loader
+            train_loader = DataLoader(
+                TensorDataset(X_train, y_train), 
+                batch_size=128, #self.cfg.batch_size
+                shuffle=True
+            )
+            
+            # Validation setup
+            val_loader = None
+            if validation_dataset is not None:
+                X_val = validation_dataset['X']
+                y_val = validation_dataset['y'].float()
+                X_val = self._normalize_data(X_val)
+                val_loader = DataLoader(
+                    TensorDataset(X_val, y_val), 
+                    batch_size=128, #self.cfg.batch_size
+                    shuffle=False
+                )
+            
+            # Early stopping setup
+            best_val_loss = float('inf')
+            patience_counter = 0
+            best_model_state = None
+            
+            # Training loop
+            if verbose:
+                print()
+            self.model.train()
+            
         num_epochs = 100  # self.cfg.epochs
         for epoch in range(num_epochs):
             epoch_loss = 0.0
@@ -133,43 +134,43 @@ class TorchLinearProbe(Probe):
             avg_train_loss = epoch_loss / num_batches
             
             # Validation
-            if val_loader is not None:
-                self.model.eval()
-                val_loss = 0.0
-                val_batches = 0
-                
-                with torch.no_grad():
+            with torch.no_grad():
+                if val_loader is not None:
+                    self.model.eval()
+                    val_loss = 0.0
+                    val_batches = 0
+                    
                     for batch_X, batch_y in val_loader:
                         outputs = self.model(batch_X.to(self.device)).squeeze()
                         loss = self.criterion(outputs, batch_y.to(self.device))
                         val_loss += loss.item()
                         val_batches += 1
-                
-                avg_val_loss = val_loss / val_batches
-                self.model.train()
-                
-                # Early stopping check
-                # if hasattr(self.cfg, 'early_stopping_patience'):
-                if True:
-                    if avg_val_loss < best_val_loss:
-                        best_val_loss = avg_val_loss
-                        patience_counter = 0
-                        best_model_state = self.model.state_dict().copy()
-                    else:
-                        patience_counter += 1
-                        
-                    if patience_counter >= 10: # self.cfg.early_stopping_patience
-                        # print(f"Early stopping at epoch {epoch+1}")
-                        break
-                
-                if (epoch + 1) % 10 == 0 and verbose:
-                    print(f"Epoch {epoch+1}/{num_epochs}, "
-                          f"Train Loss: {avg_train_loss:.4f}, "
-                          f"Val Loss: {avg_val_loss:.4f}")
-            else:
-                if (epoch + 1) % 10 == 0 and verbose:
-                    print(f"Epoch {epoch+1}/{num_epochs}, "
-                          f"Train Loss: {avg_train_loss:.4f}")
+                    
+                    avg_val_loss = val_loss / val_batches
+                    self.model.train()
+                    
+                    # Early stopping check
+                    # if hasattr(self.cfg, 'early_stopping_patience'):
+                    if True:
+                        if avg_val_loss < best_val_loss:
+                            best_val_loss = avg_val_loss
+                            patience_counter = 0
+                            best_model_state = self.model.state_dict().copy()
+                        else:
+                            patience_counter += 1
+                            
+                        if patience_counter >= 10: # self.cfg.early_stopping_patience
+                            # print(f"Early stopping at epoch {epoch+1}")
+                            break
+                    
+                    if (epoch + 1) % 10 == 0 and verbose:
+                        print(f"Epoch {epoch+1}/{num_epochs}, "
+                            f"Train Loss: {avg_train_loss:.4f}, "
+                            f"Val Loss: {avg_val_loss:.4f}")
+                else:
+                    if (epoch + 1) % 10 == 0 and verbose:
+                        print(f"Epoch {epoch+1}/{num_epochs}, "
+                            f"Train Loss: {avg_train_loss:.4f}")
         
         # Load best model if early stopping was used
         if best_model_state is not None:
@@ -196,7 +197,7 @@ class TorchLinearProbe(Probe):
             probabilities = torch.sigmoid(logits)
             predictions = (probabilities > 0.5).float()
             
-        return predictions.cpu()
+        return predictions
     
     def predict_proba(self, X):
         """
@@ -216,7 +217,64 @@ class TorchLinearProbe(Probe):
             logits = self.model(X_normalized).squeeze()
             probabilities = torch.sigmoid(logits)
             
-        return probabilities.cpu()
+        return probabilities
+
+    def eval(self, test_dataset):
+        """
+        Evaluates the probe on the test dataset using GPU-native operations.
+        Args:
+            test_dataset (dict): test_dataset['X'] has shape [batch_size, dim], test_dataset['y'] has shape [batch_size].
+        Returns:
+            results (dict): dictionary with the following keys:
+                - accuracy (float): accuracy score.
+                - roc_auc (float): roc auc score.
+                - tpr_at_1_fpr (float): tpr at 1% fpr.
+        """
+        y = test_dataset['y']
+        y_pred = self.predict(test_dataset['X'])
+        y_pred_proba = self.predict_proba(test_dataset['X'])
+
+        # accuracy = torch.mean((y_pred == y).float()).item()
+        roc_auc = self._compute_roc_auc_gpu(y, y_pred_proba).item()
+        tpr_at_1_fpr = None
+        return {
+            "roc_auc": roc_auc,
+        }, y_pred, y_pred_proba
+
+    def _compute_roc_auc_gpu(self, y_true, y_scores):
+        """
+        Compute ROC AUC using GPU-native operations.
+        This implements the AUC calculation using the Wilcoxon-Mann-Whitney statistic.
+        """
+        # Ensure tensors are the right type
+        y_true = y_true.float()
+        y_scores = y_scores.float()
+        
+        # Get indices of positive and negative samples
+        pos_mask = (y_true == 1)
+        neg_mask = (y_true == 0)
+        
+        n_pos = pos_mask.sum()
+        n_neg = neg_mask.sum()
+        
+        if n_pos == 0 or n_neg == 0:
+            return torch.tensor(0.5)  # Undefined case, return 0.5
+        
+        # Get scores for positive and negative samples
+        pos_scores = y_scores[pos_mask]
+        neg_scores = y_scores[neg_mask]
+        
+        # Use broadcasting to compare all positive scores with all negative scores
+        # pos_scores[:, None] creates shape [n_pos, 1]
+        # neg_scores[None, :] creates shape [1, n_neg]
+        # Broadcasting creates [n_pos, n_neg] comparison matrix
+        comparisons = pos_scores[:, None] > neg_scores[None, :]
+        ties = pos_scores[:, None] == neg_scores[None, :]
+        
+        # AUC = (number of correct comparisons + 0.5 * number of ties) / total comparisons
+        auc = (comparisons.float().sum() + 0.5 * ties.float().sum()) / (n_pos * n_neg)
+        
+        return auc
     
 
 class TorchAttentionProbe(Probe):
@@ -297,58 +355,58 @@ class TorchAttentionProbe(Probe):
                                                validation_dataset['y'] has shape [batch_size].
             verbose (bool, optional): Whether to print progress.
         """
-        
-        # Convert to tensors and move to device
-        X_train = train_dataset['X']
-        y_train = train_dataset['y'].float()
-        
-        # Normalize data
-        X_train = self._normalize_data(X_train, fit_transform=True)
-        
-        # Build model
-        self._build_model(X_train.shape[2])  # activation_dim is the last dimension
-        
-        # Setup optimizer
-        parameters = list(self.theta_q.parameters()) + list(self.theta_v.parameters())
-        optimizer = optim.Adam(
-            parameters, 
-            lr=self.cfg.lr, 
-            weight_decay=self.cfg.weight_decay
-        )
-        
-        # Create data loader with small batch size for gradient accumulation
-        actual_batch_size = 32  # Small batch size that fits in GPU memory
-        effective_batch_size = 128  # Effective batch size through gradient accumulation
-        accumulation_steps = effective_batch_size // actual_batch_size
-        
-        train_loader = DataLoader(
-            TensorDataset(X_train, y_train), 
-            batch_size=actual_batch_size,
-            shuffle=True
-        )
-        
-        # Validation setup
-        val_loader = None
-        if validation_dataset is not None:
-            X_val = validation_dataset['X']
-            y_val = validation_dataset['y'].float()
-            X_val = self._normalize_data(X_val)
-            val_loader = DataLoader(
-                TensorDataset(X_val, y_val), 
-                batch_size=actual_batch_size,
-                shuffle=False
+        with torch.no_grad():
+            # Convert to tensors and move to device
+            X_train = train_dataset['X']
+            y_train = train_dataset['y'].float()
+            
+            # Normalize data
+            X_train = self._normalize_data(X_train, fit_transform=True)
+            
+            # Build model
+            self._build_model(X_train.shape[2])  # activation_dim is the last dimension
+            
+            # Setup optimizer
+            parameters = list(self.theta_q.parameters()) + list(self.theta_v.parameters())
+            optimizer = optim.Adam(
+                parameters, 
+                lr=self.cfg.lr, 
+                weight_decay=self.cfg.weight_decay
             )
-        
-        # Early stopping setup
-        best_val_loss = float('inf')
-        patience_counter = 0
-        best_model_state = None
-        
-        # Training loop
-        if verbose:
-            print()
-        self.theta_q.train()
-        self.theta_v.train()
+            
+            # Create data loader with small batch size for gradient accumulation
+            actual_batch_size = 32  # Small batch size that fits in GPU memory
+            effective_batch_size = 128  # Effective batch size through gradient accumulation
+            accumulation_steps = effective_batch_size // actual_batch_size
+            
+            train_loader = DataLoader(
+                TensorDataset(X_train, y_train), 
+                batch_size=actual_batch_size,
+                shuffle=True
+            )
+            
+            # Validation setup
+            val_loader = None
+            if validation_dataset is not None:
+                X_val = validation_dataset['X']
+                y_val = validation_dataset['y'].float()
+                X_val = self._normalize_data(X_val)
+                val_loader = DataLoader(
+                    TensorDataset(X_val, y_val), 
+                    batch_size=actual_batch_size*2,
+                    shuffle=False
+                )
+            
+            # Early stopping setup
+            best_val_loss = float('inf')
+            patience_counter = 0
+            best_model_state = None
+            
+            # Training loop
+            if verbose:
+                print()
+            self.theta_q.train()
+            self.theta_v.train()
             
         num_epochs = 100
         for epoch in range(num_epochs):
@@ -382,47 +440,47 @@ class TorchAttentionProbe(Probe):
             avg_train_loss = epoch_loss / num_batches
             
             # Validation
-            if val_loader is not None:
-                self.theta_q.eval()
-                self.theta_v.eval()
+            with torch.no_grad():
+                if val_loader is not None:
+                    self.theta_q.eval()
+                    self.theta_v.eval()
+                        
+                    val_loss = 0.0
+                    val_batches = 0
                     
-                val_loss = 0.0
-                val_batches = 0
-                
-                with torch.no_grad():
                     for batch_X, batch_y in val_loader:
                         outputs = self._compute_probe_output(batch_X.to(self.device)).squeeze(-1)  # Only remove last dim, keep batch dim
                         loss = self.criterion(outputs, batch_y.to(self.device))
                         val_loss += loss.item()
                         val_batches += 1
-                
-                avg_val_loss = val_loss / val_batches
-                self.theta_q.train()
-                self.theta_v.train()
-                
-                # Early stopping check
-                if avg_val_loss < best_val_loss:
-                    best_val_loss = avg_val_loss
-                    patience_counter = 0
-                    best_model_state = {
-                        'theta_q': self.theta_q.state_dict().copy(),
-                        'theta_v': self.theta_v.state_dict().copy()
-                    }
-                else:
-                    patience_counter += 1
                     
-                if patience_counter >= 10: # self.cfg.early_stopping_patience
-                    # print(f"Early stopping at epoch {epoch+1}")
-                    break
-                
-                if (epoch + 1) % 10 == 0 and verbose:
-                    print(f"Epoch {epoch+1}/{num_epochs}, "
-                          f"Train Loss: {avg_train_loss:.4f}, "
-                          f"Val Loss: {avg_val_loss:.4f}")
-            else:
-                if (epoch + 1) % 10 == 0 and verbose:
-                    print(f"Epoch {epoch+1}/{num_epochs}, "
-                          f"Train Loss: {avg_train_loss:.4f}")
+                    avg_val_loss = val_loss / val_batches
+                    self.theta_q.train()
+                    self.theta_v.train()
+                    
+                    # Early stopping check
+                    if avg_val_loss < best_val_loss:
+                        best_val_loss = avg_val_loss
+                        patience_counter = 0
+                        best_model_state = {
+                            'theta_q': self.theta_q.state_dict().copy(),
+                            'theta_v': self.theta_v.state_dict().copy()
+                        }
+                    else:
+                        patience_counter += 1
+                        
+                    if patience_counter >= 10: # self.cfg.early_stopping_patience
+                        # print(f"Early stopping at epoch {epoch+1}")
+                        break
+                    
+                    if (epoch + 1) % 10 == 0 and verbose:
+                        print(f"Epoch {epoch+1}/{num_epochs}, "
+                            f"Train Loss: {avg_train_loss:.4f}, "
+                            f"Val Loss: {avg_val_loss:.4f}")
+                else:
+                    if (epoch + 1) % 10 == 0 and verbose:
+                        print(f"Epoch {epoch+1}/{num_epochs}, "
+                            f"Train Loss: {avg_train_loss:.4f}")
         
         # Load best model if early stopping was used
         if best_model_state is not None:
@@ -454,7 +512,7 @@ class TorchAttentionProbe(Probe):
             probabilities = torch.sigmoid(logits)
             predictions = (probabilities > 0.5).float()
             
-        return predictions.cpu()
+        return predictions
     
     def predict_proba(self, X):
         """
@@ -476,4 +534,61 @@ class TorchAttentionProbe(Probe):
             logits = self._compute_probe_output(X_normalized).squeeze(-1)  # Only remove last dim, keep batch dim
             probabilities = torch.sigmoid(logits)
             
-        return probabilities.cpu()
+        return probabilities
+
+    def eval(self, test_dataset):
+        """
+        Evaluates the probe on the test dataset using GPU-native operations.
+        Args:
+            test_dataset (dict): test_dataset['X'] has shape [batch_size, dim], test_dataset['y'] has shape [batch_size].
+        Returns:
+            results (dict): dictionary with the following keys:
+                - accuracy (float): accuracy score.
+                - roc_auc (float): roc auc score.
+                - tpr_at_1_fpr (float): tpr at 1% fpr.
+        """
+        y = test_dataset['y']
+        y_pred = self.predict(test_dataset['X'])
+        y_pred_proba = self.predict_proba(test_dataset['X'])
+
+        # accuracy = torch.mean((y_pred == y).float()).item()
+        roc_auc = self._compute_roc_auc_gpu(y, y_pred_proba).item()
+        tpr_at_1_fpr = None
+        return {
+            "roc_auc": roc_auc,
+        }, y_pred, y_pred_proba
+
+    def _compute_roc_auc_gpu(self, y_true, y_scores):
+        """
+        Compute ROC AUC using GPU-native operations.
+        This implements the AUC calculation using the Wilcoxon-Mann-Whitney statistic.
+        """
+        # Ensure tensors are the right type
+        y_true = y_true.float()
+        y_scores = y_scores.float()
+        
+        # Get indices of positive and negative samples
+        pos_mask = (y_true == 1)
+        neg_mask = (y_true == 0)
+        
+        n_pos = pos_mask.sum()
+        n_neg = neg_mask.sum()
+        
+        if n_pos == 0 or n_neg == 0:
+            return torch.tensor(0.5)  # Undefined case, return 0.5
+        
+        # Get scores for positive and negative samples
+        pos_scores = y_scores[pos_mask]
+        neg_scores = y_scores[neg_mask]
+        
+        # Use broadcasting to compare all positive scores with all negative scores
+        # pos_scores[:, None] creates shape [n_pos, 1]
+        # neg_scores[None, :] creates shape [1, n_neg]
+        # Broadcasting creates [n_pos, n_neg] comparison matrix
+        comparisons = pos_scores[:, None] > neg_scores[None, :]
+        ties = pos_scores[:, None] == neg_scores[None, :]
+        
+        # AUC = (number of correct comparisons + 0.5 * number of ties) / total comparisons
+        auc = (comparisons.float().sum() + 0.5 * ties.float().sum()) / (n_pos * n_neg)
+        
+        return auc

@@ -3,6 +3,7 @@ import argparse
 import os
 import sys
 import json
+import shutil
 
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -155,76 +156,74 @@ datasets = {
 all_policies = ["on_policy", "incentivised", "prompted", "off_policy"]
 test_policies = ["on_policy", "incentivised"]
 
-# Put script arguments here for now
-new_activations_models = ["llama_3b"]
-new_probe_types = ["attention_torch"]
-# TODO: seperate behaviours and datasources after hugging face is refactored
-new_behaviours = ["refusal", "lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception", "deception_rp", "sandbagging", "sandbagging_multi"]
 
-# Run all the new (combinations of) experiments
-for activations_model in new_activations_models:
-    for probe_type in new_probe_types:
-        for behaviour in new_behaviours:
-            
-            # Get the best policy hyperparameters across all policies
-            best_params_list = []
-            for policy in all_policies:
-                dataset_name = datasets[behaviour][policy+"_train"]
-                if dataset_name is None:
-                    continue
+def get_probe_hyperparams_and_results(new_activations_models, new_probe_types, new_behaviours):
+    # Run all the new (combinations of) experiments
+    for activations_model in new_activations_models:
+        for probe_type in new_probe_types:
+            for behaviour in new_behaviours:
+                print(f"#### Processing {probe_type} for {behaviour} on {activations_model}")
                 
-                # Search all layers for mean probes, search only best mean probe layer for attention probes
-                if probe_type == "mean":
-                    layer_list = [6,9,12,15,18,21]
-                elif probe_type == "attention_torch":
-                    cfg = ConfigDict.from_json("mean", behaviour)
-                    layer_list = [cfg.layer]
-                else:
-                    raise ValueError(f"Probe type {probe_type} not supported")
+                # Get the best hyperparameters from the json if they exist
+                best_params = ConfigDict.from_json(probe_type, behaviour)
+                if best_params is None:
+                    # Get the best policy hyperparameters across all policies
+                    best_params_list = []
+                    for policy in all_policies:
+                        print(f"#### #### Hyperparameter search for {policy}")
+                        dataset_name = datasets[behaviour][policy+"_train"]
+                        if dataset_name is None:
+                            continue
+                        
+                        # Search all layers for mean probes, search only best mean probe layer for attention probes
+                        if probe_type == "mean":
+                            layer_list = [6,9,12,15,18,21]
+                        elif probe_type == "attention_torch":
+                            cfg = ConfigDict.from_json("mean", behaviour)
+                            layer_list = [cfg.layer]
+                        else:
+                            raise ValueError(f"Probe type {probe_type} not supported")
+                        
+                        run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, layer_list)
+                        best_params_list.append(load_best_params_from_search(probe_type, dataset_name, activations_model, layer_list))
+
+                    # Work out the best behaviour hyperparameters based on best policy hyperparameters, then save them to the json
+                    best_params = ConfigDict()
+                    if probe_type == "mean":
+                        best_layers = [params["layer"] for params in best_params_list]
+                        best_params.layer = pick_popular_hyperparam(best_layers, "layer")
+                        best_c = [params["C"] for params in best_params_list]
+                        best_params.C = pick_popular_hyperparam(best_c, "c")
+                    elif probe_type == "attention_torch":
+                        best_params.layer = best_params_list[0]["layer"]
+                        best_lr = [params["lr"] for params in best_params_list]
+                        best_params.lr = pick_popular_hyperparam(best_lr, "lr")
+                        best_weight_decay = [params["weight_decay"] for params in best_params_list]
+                        best_params.weight_decay = pick_popular_hyperparam(best_weight_decay, "weight_decay")
+                    best_params.add_to_json(probe_type, behaviour, overwrite=True)
+                    
+                # Now evaluate the behaviour with the best hyperparameters
+                print(f"#### #### Evaluating {behaviour}")
+                probes_setup = []
+                for policy in all_policies:
+                    probes_setup.append([probe_type, datasets[behaviour][policy+"_train"], best_params])
+                test_dataset_names = []
+                for policy in test_policies:
+                    if datasets[behaviour][policy+"_test"] is not None:
+                        test_dataset_names.append(datasets[behaviour][policy+"_test"])                
+                run_grid_experiment_lean(probes_setup, test_dataset_names, new_activations_models)
                 
-                run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, layer_list)
-                best_params_list.append(load_best_params_from_search(probe_type, dataset_name, activations_model, layer_list))
-
-            # Work out the best behaviour hyperparameters based on best policy hyperparameters, then save them to the json
-            best_params = ConfigDict()
-            if probe_type == "mean":
-                best_layers = [params["layer"] for params in best_params_list]
-                best_params.layer = pick_popular_hyperparam(best_layers, "layer")
-                best_c = [params["C"] for params in best_params_list]
-                best_params.C = pick_popular_hyperparam(best_c, "c")
-            elif probe_type == "attention_torch":
-                best_params.layer = best_params_list[0]["layer"]
-                best_lr = [params["lr"] for params in best_params_list]
-                best_params.lr = pick_popular_hyperparam(best_lr, "lr")
-                best_weight_decay = [params["weight_decay"] for params in best_params_list]
-                best_params.weight_decay = pick_popular_hyperparam(best_weight_decay, "weight_decay")
-            best_params.add_to_json(probe_type, behaviour, overwrite=True)
+                # Delete activation files
+                hf_home = os.path.expanduser("~/.hf_home")
+                if os.path.exists(hf_home):
+                    "Deleting activation files"
+                    shutil.rmtree(hf_home)
                 
-            # Now evaluate the behaviour with the best hyperparameters
-            probes_setup = []
-            for policy in all_policies:
-                probes_setup.append([probe_type, datasets[behaviour][policy+"_train"], best_params])
-            test_dataset_names = []
-            for policy in test_policies:
-                if datasets[behaviour][policy+"_test"] is not None:
-                    test_dataset_names.append(datasets[behaviour][policy+"_test"])                
-            run_grid_experiment_lean(probes_setup, test_dataset_names, new_activations_models)
-
-
-# TODO: Add a command interface for this
-# def main():
-#     """CLI entrypoint for probe hyperparams and results extraction."""
-#     parser = argparse.ArgumentParser(description="Activation extraction")
-#     parser.add_argument("--model", default="llama_3b")
-#     parser.add_argument("--data", default="data/refusal/anthropic_raw_apr_23.jsonl")
-#     parser.add_argument(
-#         "--layers",
-#         type=str,
-#         default="auto",
-#         help="Which layers to extract activations from. Options: 'all' (all layers), 'auto' (65%% through), comma-separated indices '0,5,10', ranges '5-10', or mixed '0,5-8,15'",
-#     )
-#     args = parser.parse_args()
 
 if __name__ == "__main__":
-    # main()
-    pass
+    new_activations_models = ["llama_3b"]
+    new_probe_types = ["attention_torch"]
+    # TODO: seperate behaviours and datasources after hugging face is refactored
+    new_behaviours = ["refusal", "lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception", "deception_rp", "sandbagging", "sandbagging_multi"]
+    # new_behaviours = ["lists", "metaphors", "science", "sycophancy_arguments", "authority", "authority_arguments", "deception_rp", "sandbagging_multi", "sandbagging"]
+    get_probe_hyperparams_and_results(new_activations_models, new_probe_types, new_behaviours)

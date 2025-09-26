@@ -21,7 +21,7 @@ def _download_labels_from_hf(repo_id, labels_filename):
     )
     
 
-def _load_labels_from_local_jsonl(labels_filename, verbose):
+def _load_labels_from_local_jsonl(labels_filename, verbose=False):
     labels_list = []
     with open(labels_filename, 'r') as file:
         for line in file:
@@ -36,7 +36,7 @@ def _load_labels_from_local_jsonl(labels_filename, verbose):
     return labels_tensor
 
 
-def _load_activations_from_hf(repo_id, filename, verbose):
+def _load_activations_from_hf(repo_id, filename, verbose=False):
     # Load activations
     file_path = hf_hub_download(repo_id=repo_id, filename=filename, repo_type="dataset")
     df = joblib.load(file_path)
