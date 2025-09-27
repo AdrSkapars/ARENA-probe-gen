@@ -184,9 +184,9 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
 
     # Do followup search on just whether to normalise and use bias
     if 'torch' in probe_type:
-        print(f"\nBest Params, Layer: {layer}, LR: {lr}, Weight Decay: {weight_decay}", end="")
+        print(f"Best Params, Layer: {layer}, LR: {lr}, Weight Decay: {weight_decay}", end="")
     elif probe_type == 'mean':
-        print(f"\nBest Params, Layer: {layer}, C: {C}", end="")
+        print(f"Best Params, Layer: {layer}, C: {C}", end="")
     print(f", Normalize: {norm_bias_params[0]}, Use Bias: {norm_bias_params[1]}")
     print(f"Best roc_auc: {best_auroc}")
 

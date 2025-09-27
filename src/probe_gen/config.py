@@ -65,11 +65,8 @@ class ConfigDict(dict):
             raise KeyError(f"Config key '{dataset_name}' already exists in {probe_type} in {json_path} (set overwrite=True to replace).")
         
         # Add the new config to the json file
-        dict_self = dict(self)
-        for key in dict_self.keys():
-            if key in CFG_DEFAULTS:
-                del dict_self[key]
-        all_configs[probe_type][dataset_name] = dict_self
+        format_dict = {k: v for k, v in dict(self).items() if k not in CFG_DEFAULTS}
+        all_configs[probe_type][dataset_name] = format_dict
         with open(json_path, "w") as f:
             json.dump(all_configs, f)
 

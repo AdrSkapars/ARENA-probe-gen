@@ -229,6 +229,6 @@ if __name__ == "__main__":
     new_activations_models = ["llama_3b"]
     new_probe_types = ["attention_torch"]
     # TODO: seperate behaviours and datasources after hugging face is refactored
-    new_behaviours = ["refusal", "lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception", "deception_rp", "sandbagging", "sandbagging_multi"]
-    # new_behaviours = ["lists", "metaphors", "science", "sycophancy_arguments", "authority", "authority_arguments", "deception_rp", "sandbagging_multi", "sandbagging"]
+    # new_behaviours = ["refusal", "lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception", "deception_rp", "sandbagging", "sandbagging_multi"]
+    new_behaviours = ["lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception_rp", "sandbagging_multi", "sandbagging", "deception"]
     get_probe_hyperparams_and_results(new_activations_models, new_probe_types, new_behaviours)

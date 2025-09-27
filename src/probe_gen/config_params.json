@@ -49,20 +49,15 @@
         }
     },
     "attention_torch": {
-        "deception": {
-            "layer": 12,
-            "lr": 0.0001,
-            "weight_decay": 0.01
-        },
         "refusal": {
             "layer": 12,
             "lr": 0.0001,
             "weight_decay": 0.0
-        },
-        "sycophancy": {
+        },        
+        "lists": {
             "layer": 12,
             "lr": 0.0001,
-            "weight_decay": 0.01
+            "weight_decay": 1e-05
         }
     }
 }
