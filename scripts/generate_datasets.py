@@ -163,7 +163,7 @@ def generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, re
         if datapoints_tried == 0:
             n_samples = num_balanced * 2
         else:
-            n_samples = 200 # TODO: Make this 2000 again
+            n_samples = 2000
         found_enough_samples = prompt_dataset.generate_data(mode=mode, output_file="data/temp/prompts_latest.jsonl", n_samples=n_samples, skip=datapoints_tried)
         datapoints_tried += n_samples
         ran_out_of_data = not found_enough_samples
