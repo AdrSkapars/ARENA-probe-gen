@@ -7,9 +7,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from probe_gen.annotation.interface_dataset import Dataset, LabelledDataset
-from probe_gen.annotation.label_dataset import label_and_save_dataset
-from probe_gen.annotation.refusal_autograder import grade_data_harmbench
 from probe_gen.config import LABELLING_SYSTEM_PROMPTS
+from probe_gen.labelling.label_dataset import label_and_save_dataset
+from probe_gen.labelling.refusal_autograder import grade_data_harmbench
 
 
 def yes_no_str(v):

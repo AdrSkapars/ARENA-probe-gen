@@ -1512,9 +1512,9 @@ def process_file_outputs_only(
 
     # Process incrementally
     # Build deterministic output path under data/<behaviour>/
-    final_out_path = _build_output_path(
-        output_file, behaviour
-    )
+    # final_out_path = _build_output_path(
+    #     output_file, behaviour
+    # )
 
     num_processed = process_batched_dataframe_outputs_only(
         model,
@@ -1522,7 +1522,7 @@ def process_file_outputs_only(
         df,
         prompt_column,
         batch_size=batch_size,
-        output_file=final_out_path,
+        output_file=output_file,
         human_input_column=human_input_column,
         do_generation=do_generation,
         save_increment=save_increment,

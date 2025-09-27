@@ -9,13 +9,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Third-party imports
 from huggingface_hub import login
 
-from probe_gen.gen_data.utils import get_model, process_file_outputs_only, _build_output_path
-from probe_gen.config import MODELS, LABELLING_SYSTEM_PROMPTS
-
 from probe_gen.annotation.interface_dataset import Dataset, LabelledDataset
-from probe_gen.annotation.label_dataset import label_and_save_dataset
-
-
+from probe_gen.config import LABELLING_SYSTEM_PROMPTS, MODELS
+from probe_gen.gen_data.utils import (
+    _build_output_path,
+    get_model,
+    process_file_outputs_only,
+)
+from probe_gen.labelling.label_dataset import label_and_save_dataset
 
 hf_token = os.getenv("HF_TOKEN")
 if hf_token:

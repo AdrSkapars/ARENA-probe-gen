@@ -7,3 +7,4 @@ experiments:
     layers: [12]
     train_size: 4000
     test_size: 1000
+    temperature: 1.0
