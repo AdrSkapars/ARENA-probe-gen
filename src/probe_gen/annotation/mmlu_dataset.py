@@ -33,7 +33,7 @@ MMLU_SUBCATEGORIES = [
 ]
 
 
-class ScienceDataset(PromptDataset):
+class MMLUDataset(PromptDataset):
     """
     MMLU dataset implementation with unified PromptDataset interface.
     
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     test_categories = ["college_biology", "high_school_mathematics", "anatomy"]
     
     # Create dataset instance
-    mmlu_dataset = ScienceDataset(
+    mmlu_dataset = MMLUDataset(
         subcategories=test_categories,
         split="test"
     )
@@ -253,7 +253,7 @@ if __name__ == "__main__":
     print("Testing single category MMLU dataset...")
     
     # Use the main class with a single subcategory
-    single_dataset = ScienceDataset(
+    single_dataset = MMLUDataset(
         subcategories=["college_biology"],
         split="test"
     )

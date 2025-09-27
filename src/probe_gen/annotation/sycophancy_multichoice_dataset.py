@@ -244,7 +244,7 @@ class SycophancyMultichoiceDataset(PromptDataset):
             # Add metadata (tracking what we expect vs. what human believes)
             other_fields["question_index"].extend([question_index, question_index, question_index])
             other_fields["prompt_type"].extend(["control", "correct_belief", "wrong_belief"])
-            other_fields["correct_answer"].extend([correct_letter, correct_letter, correct_letter])
+            other_fields["correct"].extend([correct_letter, correct_letter, correct_letter])
             other_fields["human_belief"].extend([None, correct_letter, wrong_letter])
             other_fields["shuffled_index"].extend([shuffled_idx, shuffled_idx, shuffled_idx])  # Track position in shuffled dataset
             other_fields["processed_index"].extend([skip + i, skip + i, skip + i])  # Track position in processed subset

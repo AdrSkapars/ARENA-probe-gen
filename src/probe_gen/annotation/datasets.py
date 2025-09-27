@@ -15,12 +15,12 @@ Usage:
 # Base classes
 from .interface_dataset import Dataset, Message
 from .jailbreak_dataset import HarmfulRequestDataset, JailbreakDataset
+from .mmlu_dataset import MMLUDataset
 from .prompt_dataset import PromptDataset
 
 # Specific dataset implementations
 from .refusal_dataset import RefusalDataset
 from .sandbagging_multi_dataset import SandbaggingMultiDataset
-from .science_dataset import ScienceDataset
 from .shakespeare_dataset import ShakespeareDataset
 from .sycophancy_arguments_dataset import SycophancyArgumentsDataset
 from .sycophancy_multichoice_dataset import SycophancyMultichoiceDataset
@@ -38,7 +38,7 @@ __all__ = [
     'JailbreakDataset',
     'HarmfulRequestDataset',
     'RefusalDataset',
-    'ScienceDataset',
+    'MMLUDataset',
     'UltrachatDataset', 
     'SandbaggingMultiDataset',
     'ShakespeareDataset',

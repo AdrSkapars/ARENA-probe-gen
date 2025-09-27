@@ -22,7 +22,13 @@ from probe_gen.labelling.refusal_autograder import grade_data_harmbench
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Third-party imports
+import gc
+import os
+import shutil
+
+import torch
 from huggingface_hub import HfApi, login
+from transformers.utils import TRANSFORMERS_CACHE
 
 hf_token = os.getenv("HF_TOKEN")
 if hf_token:
@@ -39,6 +45,22 @@ def get_prompt_dataset(behaviour, datasource):
         elif datasource == "arguments":
             return SycophancyArgumentsDataset()
     
+    if behaviour == "sandbagging" and datasource == "multichoice":
+        return SandbaggingMultiDataset()
+    
+    if datasource == "stories":
+        return TinyStoriesDataset()
+    if datasource == "ultrachat":
+        return UltrachatDataset()
+    if datasource == "shakespeare":
+        return ShakespeareDataset()
+    if datasource == "mmlu":
+        return MMLUDataset()
+    if datasource == "jailbreaks":
+        return JailbreakDataset()
+    if datasource == "hh_rlhf":
+        return RefusalDataset()
+
     return None
 
 def get_labels(behaviour, datasource, prompts_path, responses_path, out_path, num_balanced):
@@ -141,7 +163,7 @@ def generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, re
         if datapoints_tried == 0:
             n_samples = num_balanced * 2
         else:
-            n_samples = 2000
+            n_samples = 200 # TODO: Make this 2000 again
         found_enough_samples = prompt_dataset.generate_data(mode=mode, output_file="data/temp/prompts_latest.jsonl", n_samples=n_samples, skip=datapoints_tried)
         datapoints_tried += n_samples
         ran_out_of_data = not found_enough_samples
@@ -179,13 +201,18 @@ def generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, re
 
     # Save dataset
     REPO_NAME = f"lasrprobegen/{behaviour}-activations"
-    HF_TOKEN = os.environ["HF_TOKEN"]
+    hf_token = os.getenv("HF_TOKEN")
+    if hf_token:
+        login(token=hf_token)   
+    
+    print(hf_token)
+
     api = HfApi()
     print("Creating repository...")
     api.create_repo(
         repo_id=REPO_NAME,
         repo_type="dataset",
-        token=HF_TOKEN,
+        token=hf_token,
         private=False,
         exist_ok=True
     )
@@ -196,7 +223,7 @@ def generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, re
         path_in_repo=path_in_repo,
         repo_id=REPO_NAME,
         repo_type="dataset",
-        token=HF_TOKEN,
+        token=hf_token,
     )
 
 def generate_and_save_activations(behaviour, datasource, activations_model, response_model, generation_method, mode, layers, balanced_responses_filepath):
@@ -223,14 +250,16 @@ def generate_and_save_activations(behaviour, datasource, activations_model, resp
     )
 
     REPO_NAME = f"lasrprobegen/{behaviour}-activations"
-    HF_TOKEN = os.environ["HF_TOKEN"]
+    hf_token = os.getenv("HF_TOKEN")
+    if hf_token:
+        login(token=hf_token)
 
     api = HfApi()
     print("Creating repository...")
     api.create_repo(
         repo_id=REPO_NAME,
         repo_type="dataset",
-        token=HF_TOKEN,
+        token=hf_token,
         private=False,
         exist_ok=True
     )
@@ -243,7 +272,7 @@ def generate_and_save_activations(behaviour, datasource, activations_model, resp
             path_in_repo=path_in_repo,
             repo_id=REPO_NAME,
             repo_type="dataset",
-            token=HF_TOKEN,
+            token=hf_token,
         )
 
 
@@ -301,6 +330,13 @@ def main():
                     for file in temp_dir.iterdir():
                         if file.is_file():  # only delete files, not subdirs
                             file.unlink()
+        
+        # Clear Huggingface cache before next experiment
+        if hasattr(torch.cuda, 'empty_cache'):
+            torch.cuda.empty_cache()  # Clear GPU cache if using CUDA
+        gc.collect()
+        if os.path.exists(TRANSFORMERS_CACHE):
+            shutil.rmtree(TRANSFORMERS_CACHE)
 
 if __name__ == "__main__":
     main()

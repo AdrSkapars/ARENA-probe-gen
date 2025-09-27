@@ -14,15 +14,6 @@ from probe_gen.annotation import (
 from probe_gen.annotation.datasets import *
 from probe_gen.paths import data
 
-PROMPT_DATASETS = {
-    "hh_rlhf": HHRLHFDataset,
-    "ultrachat": UltrachatDataset,
-    "shakespeare": ShakespeareDataset,
-    "science": ScienceDataset,
-    "jailbreaks": JailbreakDataset,
-    "lists": ListsDataset,
-    "metaphors": MetaphorsDataset,
-}
 
 class ConfigDict(dict):
     """A dict with attribute-style access (e.g. cfg.epochs instead of cfg['epochs'])."""
