@@ -291,6 +291,8 @@ def plot_mean_summary_barchart(
     means = np.full((len(train_set_types), 2), 0.6, dtype=float)
     standard_errors = np.full((len(train_set_types), 2), 0.6, dtype=float)
     test_set_types = ['on_policy_test', 'on_policy_OOD_test']
+    if incentivised_mode:
+        test_set_types = ['incentivised_test', 'incentivised_OOD_test']
     for i in range(len(test_set_types)):
         print(f"Fetching {test_set_types[i]} Tested Results...")
         results_table = _get_results_table_from_wandb(behaviours, train_set_types, test_set_types[i])
@@ -327,7 +329,10 @@ def plot_mean_summary_barchart(
     ax.set_ylabel(ylabel)
 
     if title is None:
-        title = "Mean (and standard error) of Linear Probes Trained on ID Training Sets Across All Behaviours" 
+        if not incentivised_mode:
+            title = "Mean (and standard error) of Linear Probes Trained on ID Sets, Evaluated on On-Policy Sets Across All Behaviours" 
+        else:
+            title = "Mean (and standard error) of Linear Probes Trained on ID Sets, Evaluated on On-Policy Incentivised Sets Across All Behaviours" 
     ax.set_title(title)
     ax.set_xticks(x)
     import textwrap
