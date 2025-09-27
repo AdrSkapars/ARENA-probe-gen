@@ -1,0 +1,9 @@
+experiments:
+  - behaviour: refusal
+    datasources: ["hh_rlhf", "ultrachat"]
+    generation_methods: ["on_policy", "prompted", "incentivised", "off_policy"]
+    off_policy_model: "llama_3b"
+    activations_model: "llama_3b"
+    layers: [12]
+    train_size: 4000
+    test_size: 1000
