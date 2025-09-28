@@ -126,6 +126,9 @@ class PromptDataset(ABC):
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file = str(output_file)
 
+        if mode == "test":
+            skip += self.default_train_test_gap
+
         # Check if using single dataset mode (backwards compatibility)
         self._validate_inputs(mode, n_samples, skip)
         print(f"Generating {n_samples} {mode} samples (skip={skip})")
