@@ -13,6 +13,8 @@ Usage:
 """
 
 # Base classes
+from .authority_arguments_dataset import AuthorityArgumentsDataset
+from .authority_multichoice_dataset import AuthorityMultichoiceDataset
 from .interface_dataset import Dataset, Message
 from .jailbreak_dataset import HarmfulRequestDataset, JailbreakDataset
 from .mmlu_dataset import MMLUDataset
@@ -47,4 +49,6 @@ __all__ = [
     'TinyStoriesDataset',
     'JailbreakDataset',
     'HarmfulRequestDataset',
+    'AuthorityArgumentsDataset',
+    'AuthorityMultichoiceDataset',
 ]
