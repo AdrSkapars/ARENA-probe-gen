@@ -1,104 +1,4 @@
 {
-    "attention_torch": {
-        "deception_deepseek_mixtral_3.5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.01
-        },
-        "deception_llama_3b_3.5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.01
-        },
-        "deception_llama_3b_prompted_3.5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.01
-        },
-        "lists_llama_3b_5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
-        },
-        "lists_llama_3b_prompted_5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
-        },
-        "refusal_llama_3b_5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.0
-        },
-        "refusal_llama_3b_prompted_5k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
-        },
-        "refusal_ministral_8b_5k": {
-            "layer": 15,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
-        },
-        "sycophancy_llama_3b_4k": {
-            "layer": 12,
-            "lr": 0.0005,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.0
-        },
-        "sycophancy_llama_3b_prompted_4k": {
-            "layer": 12,
-            "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
-        },
-        "sycophancy_ministral_8b_4k": {
-            "layer": 15,
-            "lr": 0.001,
-            "normalize": true,
-            "use_bias": false,
-            "weight_decay": 0.01
-        },
-        "sycophancy_short_llama_3b_4k": {
-            "layer": 12,
-            "lr": 0.0005,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.01
-        },
-        "sycophancy_short_llama_3b_prompted_4k": {
-            "layer": 12,
-            "lr": 0.0005,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.01
-        },
-        "sycophancy_short_qwen_3b_4k": {
-            "layer": 12,
-            "lr": 0.0005,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
-        }
-    },
     "mean": {
         "authority": {
             "C": 0.001,
@@ -138,26 +38,37 @@
         }
     },
     "mean_torch": {
-        "refusal_llama_3b_5k": {
+        "refusal": {
             "layer": 12,
             "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
             "weight_decay": 0.0
-        },
-        "refusal_llama_3b_prompted_5k": {
+        }
+    },
+    "attention_torch": {
+        "refusal": {
             "layer": 12,
             "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
             "weight_decay": 0.0
         },
-        "refusal_ministral_8b_5k": {
-            "layer": 15,
+        "lists": {
+            "layer": 12,
             "lr": 0.0001,
-            "normalize": true,
-            "use_bias": true,
-            "weight_decay": 0.1
+            "weight_decay": 1e-05
+        },
+        "metaphors": {
+            "layer": 12,
+            "lr": 0.0001,
+            "weight_decay": 1e-05
+        },
+        "science": {
+            "layer": 12,
+            "lr": 0.0001,
+            "weight_decay": 1e-05
+        },
+        "sycophancy": {
+            "layer": 12,
+            "lr": 0.001,
+            "weight_decay": 1e-05
         }
     }
 }

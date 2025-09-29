@@ -1,7 +1,8 @@
 import numpy as np
+import torch
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve
 from .base import Probe
 
 
@@ -69,5 +70,44 @@ class SklearnLogisticProbe(Probe):
         X_normalized = (X_numpy - self.transformation_mean) / self.transformation_std
         y_pred_proba = self.classifier.predict_proba(X_normalized)[:, 1]  # probabilities for class 1
         return y_pred_proba
-        
+    
+    def eval(self, test_dataset):
+        """
+        Evaluates the probe on the test dataset.
+        Args:
+            test_dataset (dict): test_dataset['X'] has shape [batch_size, dim], test_dataset['y'] has shape [batch_size].
+        Returns:
+            results (dict): dictionary with the following keys:
+                - accuracy (float): accuracy score.
+                - roc_auc (float): roc auc score.
+                - tpr_at_1_fpr (float): tpr at 1% fpr.
+        """
+        y = self._safe_to_numpy(test_dataset['y'])
+        y_pred = self._safe_to_numpy(self.predict(test_dataset['X']))
+        y_pred_proba = self._safe_to_numpy(self.predict_proba(test_dataset['X']))
+
+        # Evaluate the model
+        accuracy = accuracy_score(y, y_pred)
+        roc_auc = roc_auc_score(y, y_pred_proba)
+
+        # Calculate TPR at 1% FPR (as mentioned in paper)
+        fpr, tpr, thresholds = roc_curve(y, y_pred_proba)
+        target_fpr = 0.01
+        idx = np.argmax(fpr >= target_fpr)
+        tpr_at_1_fpr = tpr[idx] if idx < len(tpr) else 0
+
+        return {
+            "accuracy": accuracy,
+            "roc_auc": roc_auc,
+            "tpr_at_1_fpr": tpr_at_1_fpr,
+        }, y_pred, y_pred_proba
+    
+    def _safe_to_numpy(self, data):
+        """Convert PyTorch tensor OR numpy array to numpy array"""
+        if isinstance(data, torch.Tensor):
+            return data.detach().cpu().numpy()
+        elif isinstance(data, np.ndarray):
+            return data  # Already numpy
+        else:
+            return np.array(data)  # Convert other types
 

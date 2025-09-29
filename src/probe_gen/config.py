@@ -14,7 +14,7 @@ from probe_gen.annotation import (
 from probe_gen.annotation.datasets import *
 from probe_gen.paths import data
 
-
+CFG_DEFAULTS = {"seed": 42, "normalize": True, "use_bias": True}   # set defaults here
 class ConfigDict(dict):
     """A dict with attribute-style access (e.g. cfg.epochs instead of cfg['epochs'])."""
     __getattr__ = dict.get
@@ -22,8 +22,7 @@ class ConfigDict(dict):
     __delattr__ = dict.__delitem__
     
     def __init__(self, *args, **kwargs):
-        default_values = {"seed": 42}  # set defaults here
-        combined = dict(default_values)
+        combined = dict(CFG_DEFAULTS)
         if args:
             if len(args) > 1:
                 raise TypeError(f"{self.__class__.__name__} expected at most 1 positional argument, got {len(args)}")
@@ -33,26 +32,30 @@ class ConfigDict(dict):
 
     @classmethod
     def from_json(cls, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json"):
-
-        if probe_type == 'mean':
-            if dataset_name.startswith("deception_rp"):
-                dataset_name = "deception_rp"
-            else:
-                dataset_name = dataset_name.split("_")[0]
+        if dataset_name.startswith("deception_rp"):
+            dataset_name = "deception_rp"
+        elif dataset_name.startswith("authority_arguments"):
+            dataset_name = "authority_arguments"
+        elif dataset_name.startswith("sycophancy_arguments"):
+            dataset_name = "sycophancy_arguments"
+        elif dataset_name.startswith("sandbagging_multi"):
+            dataset_name = "sandbagging_multi"
+        elif dataset_name.startswith("sycophancy_short"):
+            dataset_name = "sycophancy_short"
+        else:
+            dataset_name = dataset_name.split("_")[0]
 
         with open(json_path, "r") as f:
             all_configs = json.load(f)
+        if dataset_name not in all_configs[probe_type]:
+            print(f"Config for '{dataset_name}' not found in {probe_type} in {json_path}")
+            return None
         if "config_layer" in all_configs[probe_type][dataset_name]:
             all_configs[probe_type][dataset_name]["layer"] = all_configs[probe_type][dataset_name].pop("config_layer")
-        if dataset_name not in all_configs[probe_type]:
-            raise KeyError(f"Config for '{dataset_name}' not found in {probe_type} in {json_path}")
         config_dict = all_configs[probe_type][dataset_name]
         return cls(config_dict)
     
-    def add_to_json(self, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json", overwrite:bool=True):
-        if probe_type == 'mean':
-            raise ValueError("We are now manually adding mean probe configs to the json file.")
-        
+    def add_to_json(self, probe_type:str, dataset_name:str, json_path=data.probe_gen/"config_params.json", overwrite:bool=False):
         # Load existing configs (or create new dict if file doesn't exist yet)
         if os.path.isfile(json_path):
             with open(json_path, "r") as f:
@@ -63,13 +66,10 @@ class ConfigDict(dict):
             raise KeyError(f"Config key '{dataset_name}' already exists in {probe_type} in {json_path} (set overwrite=True to replace).")
         
         # Add the new config to the json file
-        if probe_type != 'mean':
-            all_configs[probe_type][dataset_name] = dict(self)
-            # MADE CHANGE HERE NK
-            if "seed" in all_configs[probe_type][dataset_name]:
-                del all_configs[probe_type][dataset_name]["seed"]
+        format_dict = {k: v for k, v in dict(self).items() if k not in CFG_DEFAULTS}
+        all_configs[probe_type][dataset_name] = format_dict
         with open(json_path, "w") as f:
-            json.dump(all_configs, f, indent=4, sort_keys=True)
+            json.dump(all_configs, f, indent=4)
 
 
 MODELS = {

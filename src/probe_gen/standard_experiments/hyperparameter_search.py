@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 
+from collections import Counter
 from tqdm import tqdm
 
 project_root = Path(__file__).parent.parent
@@ -9,12 +10,13 @@ import probe_gen.probes as probes
 from probe_gen.config import ConfigDict
 from probe_gen.probes.wandb_interface import load_probe_eval_dicts_as_df
 
+# TODO: make layers list be conditional on activations model
 LAYERS_LIST = [6,9,12,15,18,21]
-USE_BIAS_RANGE = [True] #[True, False]
-NORMALIZE_RANGE = [True] #[True, False]
+USE_BIAS_RANGE = [True]
+NORMALIZE_RANGE = [True]
 C_RANGE = [0.001, 0.01, 0.1, 1, 10]
-LR_RANGE = [1e-4, 5e-4, 1e-3]
-WEIGHT_DECAY_RANGE = [0, 1e-2, 1e-1]
+LR_RANGE = [1e-4, 1e-3, 1e-2]
+WEIGHT_DECAY_RANGE = [0, 1e-5, 1e-4]
 
 
 def load_best_params_from_search(probe_type, dataset_name, activations_model, layers_list=LAYERS_LIST):
@@ -94,7 +96,7 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
     normalize = norm_bias_params[0]
     use_bias = norm_bias_params[1]
     for layer in layers_list:
-        print(f"\n######################### Evaluating layer {layer} #############################")
+        print(f"#### #### #### Evaluating layer {layer}")
         activations_tensor, attention_mask, labels_tensor = probes.load_hf_activations_and_labels_at_layer(dataset_name, layer)
         if "mean" in probe_type:
             activations_tensor = probes.MeanAggregation()(activations_tensor, attention_mask)
@@ -104,10 +106,8 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
             train_dataset, val_dataset, _ = probes.create_activation_datasets(activations_tensor, labels_tensor, splits=[3500, 500, 0])
 
         if 'torch' in probe_type:
-            for lr in tqdm(LR_RANGE):
-                print(f"lr: {lr}")
-                for weight_decay in WEIGHT_DECAY_RANGE:
-                    print(f"weight_decay: {weight_decay}")
+            for lr in LR_RANGE:
+                for weight_decay in tqdm(WEIGHT_DECAY_RANGE):
                     if probe_type == "mean_torch":
                         probe = probes.TorchLinearProbe(ConfigDict(use_bias=use_bias, normalize=normalize, lr=lr, weight_decay=weight_decay))
                     elif probe_type == "attention_torch":
@@ -184,8 +184,38 @@ def run_full_hyp_search_on_layers(probe_type, dataset_name, activations_model, l
 
     # Do followup search on just whether to normalise and use bias
     if 'torch' in probe_type:
-        print(f"\nBest Params, Layer: {layer}, LR: {lr}, Weight Decay: {weight_decay}", end="")
+        print(f"Best Params, Layer: {layer}, LR: {lr}, Weight Decay: {weight_decay}", end="")
     elif probe_type == 'mean':
-        print(f"\nBest Params, Layer: {layer}, C: {C}", end="")
+        print(f"Best Params, Layer: {layer}, C: {C}", end="")
     print(f", Normalize: {norm_bias_params[0]}, Use Bias: {norm_bias_params[1]}")
     print(f"Best roc_auc: {best_auroc}")
+
+
+def pick_popular_hyperparam(best_params_list, param_name):
+    """
+    best_params_list: list of best hyperparameters for each policy
+    param_name: name of the hyperparameter to pick (e.g. "layer", "c", "lr", "weight_decay")
+    """
+    if param_name == "layer":
+        params_range = LAYERS_LIST
+    elif param_name == "c":
+        params_range = C_RANGE
+    elif param_name == "lr":
+        params_range = LR_RANGE
+    elif param_name == "weight_decay":
+        params_range = WEIGHT_DECAY_RANGE
+    else:
+        raise ValueError(f"Parameter name {param_name} not valid.")
+        
+    n = len(best_params_list)
+    counts = Counter(best_params_list)
+    
+    # Step 1: Check for majority element
+    for num, count in counts.items():
+        if count > n // 2:  # strictly more than half
+            return num
+    
+    # Step 2: If no majority, take mean and find closest in params_range
+    mean_val = sum(best_params_list) / n
+    closest = min(params_range, key=lambda x: abs(x - mean_val))
+    return closest

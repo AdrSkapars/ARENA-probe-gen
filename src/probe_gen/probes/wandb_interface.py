@@ -46,9 +46,9 @@ def save_probe_dict_results(eval_dict, probe_type, train_set_name, test_set_name
     )
     # Log metrics
     wandb.log({
-        "accuracy": eval_dict['accuracy'],
-        "roc_auc": eval_dict['roc_auc'],
-        "tpr_at_1_fpr": eval_dict['tpr_at_1_fpr'],
+        "accuracy": None if 'accuracy' not in eval_dict else eval_dict['accuracy'],
+        "roc_auc": None if 'roc_auc' not in eval_dict else eval_dict['roc_auc'],
+        "tpr_at_1_fpr": None if 'tpr_at_1_fpr' not in eval_dict else eval_dict['tpr_at_1_fpr'],
     })
     # Finish the run
     wandb.finish()
