@@ -48,6 +48,9 @@ class data:
     data = SmartPath(DATA_DIR)
     figures = SmartPath(DATA_DIR / "figures")
 
+    # Common location for all prompt datasets
+    prompt_datasets = SmartPath(DATA_DIR / "prompt_datasets")
+
     ultrachat_brazil = SmartPath(DATA_DIR / "ultrachat_brazil")
     
     refusal = SmartPath(DATA_DIR / "refusal")

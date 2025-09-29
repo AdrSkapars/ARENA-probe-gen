@@ -9,13 +9,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Third-party imports
 from huggingface_hub import login
 
-from probe_gen.gen_data.utils import get_model, process_file_outputs_only, _build_output_path
-from probe_gen.config import MODELS, LABELLING_SYSTEM_PROMPTS
-
 from probe_gen.annotation.interface_dataset import Dataset, LabelledDataset
-from probe_gen.annotation.label_dataset import label_and_save_dataset
-
-
+from probe_gen.config import LABELLING_SYSTEM_PROMPTS, MODELS
+from probe_gen.gen_data.utils import (
+    _build_output_path,
+    get_model,
+    process_file_outputs_only,
+)
+from probe_gen.labelling.label_dataset import label_and_save_dataset
 
 hf_token = os.getenv("HF_TOKEN")
 if hf_token:
@@ -50,6 +51,12 @@ def main():
         type=str,
         default="refusal",
         help="Name of the behaviour bucket; outputs saved under datasets/<behaviour>/",
+    )
+    parser.add_argument(
+        "--datasource",
+        type=str,
+        default="ultrachat",
+        help="Name of the datasource",
     )
     parser.add_argument(
         "--add-prompt",
@@ -90,6 +97,7 @@ def main():
         output_file="temp_outputs",
         batch_size=args.batch_size,
         behaviour=args.behaviour,
+        datasource=args.datasource,
         sample=args.sample,
         add_prompt=yes_no_str(args.add_prompt),
         prompt_type=args.prompt_type,
