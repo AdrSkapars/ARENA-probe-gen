@@ -68,7 +68,7 @@ class ConfigDict(dict):
         format_dict = {k: v for k, v in dict(self).items() if k not in CFG_DEFAULTS}
         all_configs[probe_type][dataset_name] = format_dict
         with open(json_path, "w") as f:
-            json.dump(all_configs, f)
+            json.dump(all_configs, f, indent=4)
 
 
 MODELS = {

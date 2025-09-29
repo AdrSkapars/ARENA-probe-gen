@@ -185,7 +185,10 @@ def get_probe_hyperparams_and_results(new_activations_models, new_probe_types, n
                             layer_list = [6,9,12,15,18,21]
                         elif probe_type == "attention_torch":
                             cfg = ConfigDict.from_json("mean", behaviour)
-                            layer_list = [cfg.layer]
+                            if "layer" in cfg:
+                                layer_list = [cfg.layer]
+                            else:
+                                layer_list = [12]
                         else:
                             raise ValueError(f"Probe type {probe_type} not supported")
                         
@@ -230,5 +233,5 @@ if __name__ == "__main__":
     new_probe_types = ["attention_torch"]
     # TODO: seperate behaviours and datasources after hugging face is refactored
     # new_behaviours = ["refusal", "lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception", "deception_rp", "sandbagging", "sandbagging_multi"]
-    new_behaviours = ["lists", "metaphors", "science", "sycophancy", "sycophancy_arguments", "authority", "authority_arguments", "deception_rp", "sandbagging_multi", "sandbagging", "deception"]
+    new_behaviours = ["sycophancy_arguments", "authority", "authority_arguments", "deception_rp", "sandbagging_multi", "sandbagging", "deception"]
     get_probe_hyperparams_and_results(new_activations_models, new_probe_types, new_behaviours)
