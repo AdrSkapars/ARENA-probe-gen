@@ -70,5 +70,5 @@ ACTIVATION_DATASETS = {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
         "activations_filename_prefix": "mistral_7b_balanced_500_layer_",
         "labels_filename": data.deception_rp / "mistral_7b_balanced_500.jsonl",
-    },
-    
+    }
+}
