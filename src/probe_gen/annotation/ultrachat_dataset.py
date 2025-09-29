@@ -72,7 +72,7 @@ class UltrachatDataset(PromptDataset):
         self, 
         variant: str = "ultrachat",
         max_prompt_length: int = 500,
-        default_train_test_gap: int = 1000
+        default_train_test_gap: int = 40000
     ):
         """
         Initialize Ultrachat prompt dataset.

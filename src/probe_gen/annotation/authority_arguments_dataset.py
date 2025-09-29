@@ -315,7 +315,7 @@ class AuthorityArgumentsDataset(PromptDataset):
         self, 
         raw_data_dir: Optional[str] = None,
         arguments_csv_path: Optional[str] = None,
-        default_train_test_gap: int = 100
+        default_train_test_gap: int = 10000
     ):
         """
         Initialize Authority Arguments prompt dataset.

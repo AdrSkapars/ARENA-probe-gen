@@ -38,7 +38,7 @@ class ShakespeareDataset(PromptDataset):
         self, 
         min_prompt_length: int = 40,
         kaggle_dataset_id: str = "guslovesmath/shakespeare-plays-dataset",
-        default_train_test_gap: int = 1000
+        default_train_test_gap: int = 45000
     ):
         """
         Initialize Shakespeare prompt dataset.

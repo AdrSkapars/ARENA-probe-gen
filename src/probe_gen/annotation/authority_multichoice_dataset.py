@@ -260,7 +260,7 @@ class AuthorityMultichoiceDataset(PromptDataset):
         self, 
         hf_repo_id: str = "lasrprobegen/opentrivia-authority-activations",
         csv_filename: str = "open_trivia_shuffled.csv",
-        default_train_test_gap: int = 100
+        default_train_test_gap: int = 30000
     ):
         """
         Initialize Authority Multichoice prompt dataset.

@@ -35,7 +35,7 @@ class SycophancyArgumentsDataset(PromptDataset):
         self, 
         hf_repo_id: str = "lasrprobegen/opentrivia-sycophancy-activations",
         csv_filename: str = "arguments.csv",
-        default_train_test_gap: int = 100
+        default_train_test_gap: int = 10000
     ):
         """
         Initialize Sycophancy Arguments prompt dataset.

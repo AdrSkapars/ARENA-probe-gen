@@ -38,7 +38,7 @@ class SycophancyMultichoiceDataset(PromptDataset):
         hf_repo_id: str = "lasrprobegen/opentrivia-authority-activations",
         csv_filename: str = "open_trivia_shuffled.csv",
         response_format: str = "long",
-        default_train_test_gap: int = 100
+        default_train_test_gap: int = 30000
     ):
         """
         Initialize Sycophancy Multiple Choice prompt dataset.
