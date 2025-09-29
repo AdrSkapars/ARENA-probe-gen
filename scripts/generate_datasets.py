@@ -39,7 +39,24 @@ if hf_token:
 
 
 def check_experiments_are_valid(experiments):
-    return True
+    if experiments is None:
+        raise ValueError("Experiments is None")
+    if not isinstance(experiments, list):
+        raise ValueError("Experiments is not a list")
+    if not all(isinstance(exp, dict) for exp in experiments):
+        raise ValueError("Experiments is not a list of dictionaries")
+    
+    for exp in experiments:
+        if exp["train_size"] < 0 or exp["test_size"] < 0:
+            raise ValueError("Train size and test size must be greater than 0, or 0 to skip")
+        if len(exp["layers"]) == 0:
+            raise ValueError("Layers must be a non-empty list")
+        if exp["temperature"] < 0:
+            raise ValueError("Temperature must be non negative")
+        if exp["activations_model"] not in MODELS:
+            raise ValueError("Activations model must be a valid model in the config file")
+        if exp["off_policy_model"] not in MODELS:
+            raise ValueError("Off policy model must be a valid model in the config file")
 
 def get_prompt_dataset(behaviour, datasource):
     if behaviour == "sycophancy":
@@ -47,6 +64,11 @@ def get_prompt_dataset(behaviour, datasource):
             return SycophancyMultichoiceDataset()
         elif datasource == "arguments":
             return SycophancyArgumentsDataset()
+    if behaviour == "authority":
+        if datasource == "multichoice":
+            return AuthorityMultichoiceDataset()
+        elif datasource == "arguments":
+            return AuthorityArgumentsDataset()
     
     if behaviour == "sandbagging" and datasource == "multichoice":
         return SandbaggingMultiDataset()
@@ -308,47 +330,52 @@ def main():
 
     # Loop over each experiment
     for exp in experiments:
-        behaviour = exp["behaviour"]
-        datasources = exp["datasources"]
-        generation_methods = exp["generation_methods"]
-        off_policy_model = exp["off_policy_model"]
-        activations_model = exp["activations_model"]
-        layers = exp["layers"]
-        train_size = exp["train_size"]
-        test_size = exp["test_size"]
-        temperature = exp["temperature"]
+        try:
+            behaviour = exp["behaviour"]
+            datasources = exp["datasources"]
+            generation_methods = exp["generation_methods"]
+            off_policy_model = exp["off_policy_model"]
+            activations_model = exp["activations_model"]
+            layers = exp["layers"]
+            train_size = exp["train_size"]
+            test_size = exp["test_size"]
+            temperature = exp["temperature"]
 
-        for datasource in datasources:
-            prompt_dataset = get_prompt_dataset(behaviour, datasource)
-            for generation_method in generation_methods:
+            for datasource in datasources:
+                prompt_dataset = get_prompt_dataset(behaviour, datasource)
+                for generation_method in generation_methods:
 
-                if generation_method == "off_policy":
-                    response_model = off_policy_model
-                else:
-                    response_model = activations_model
+                    if generation_method == "off_policy":
+                        response_model = off_policy_model
+                    else:
+                        response_model = activations_model
 
-                if train_size > 0:
-                    generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, response_model, temperature, generation_method, "train", train_size)
-                    generate_and_save_activations(behaviour, datasource, activations_model, response_model, generation_method, "train", layers, "data/temp/balanced_labelled_responses_all.jsonl")
-                    # Delete all files that were used
-                    for file in temp_dir.iterdir():
-                        if file.is_file():  # only delete files, not subdirs
-                            file.unlink()
-                
-                if test_size > 0:
-                    generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, response_model, temperature, generation_method, "test", test_size)
-                    generate_and_save_activations(behaviour, datasource, activations_model, response_model, generation_method, "test", layers, "data/temp/balanced_labelled_responses_all.jsonl")
-                    # Delete all files that were used
-                    for file in temp_dir.iterdir():
-                        if file.is_file():  # only delete files, not subdirs
-                            file.unlink()
-        
-        # Clear Huggingface cache before next experiment
-        if hasattr(torch.cuda, 'empty_cache'):
-            torch.cuda.empty_cache()  # Clear GPU cache if using CUDA
-        gc.collect()
-        if os.path.exists(TRANSFORMERS_CACHE):
-            shutil.rmtree(TRANSFORMERS_CACHE)
+                    if train_size > 0:
+                        generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, response_model, temperature, generation_method, "train", train_size)
+                        generate_and_save_activations(behaviour, datasource, activations_model, response_model, generation_method, "train", layers, "data/temp/balanced_labelled_responses_all.jsonl")
+                        # Delete all files that were used
+                        for file in temp_dir.iterdir():
+                            if file.is_file():  # only delete files, not subdirs
+                                file.unlink()
+                    
+                    if test_size > 0:
+                        generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, response_model, temperature, generation_method, "test", test_size)
+                        generate_and_save_activations(behaviour, datasource, activations_model, response_model, generation_method, "test", layers, "data/temp/balanced_labelled_responses_all.jsonl")
+                        # Delete all files that were used
+                        for file in temp_dir.iterdir():
+                            if file.is_file():  # only delete files, not subdirs
+                                file.unlink()
+            
+            # Clear Huggingface cache before next experiment
+            if hasattr(torch.cuda, 'empty_cache'):
+                torch.cuda.empty_cache()  # Clear GPU cache if using CUDA
+            gc.collect()
+            if os.path.exists(TRANSFORMERS_CACHE):
+                shutil.rmtree(TRANSFORMERS_CACHE)
+
+        except Exception as e:
+            print(f"Error generating datasets for {exp}: {e}")
+            continue
 
 if __name__ == "__main__":
     main()
