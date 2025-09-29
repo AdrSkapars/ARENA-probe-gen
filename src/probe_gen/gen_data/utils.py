@@ -1445,7 +1445,6 @@ def process_file(
         save_increment=save_increment,
     )
 
-
 def process_file_outputs_only(
     model,
     tokenizer,
@@ -1453,6 +1452,7 @@ def process_file_outputs_only(
     output_file: str,
     batch_size: int = 1,
     behaviour: str = "refusal",
+    datasource: str = "ultrachat",
     sample: int = 0,
     add_prompt: bool = False, 
     prompt_type: str = "alternating", 
@@ -1487,16 +1487,17 @@ def process_file_outputs_only(
         human_input_column = "human_inputs"
     else:
         # For off_policy_prompt, prepend extra_prompt to human inputs and generate new responses
+        prompts_key = f"{behaviour}_{datasource}" if f"{behaviour}_{datasource}" in BEHAVIOUR_PROMPTS.keys() else behaviour
         if prompt_type == "alternating":
             if direct_or_incentivised == "direct":
-                positive_prompt = BEHAVIOUR_PROMPTS[behaviour]['positive']
-                negative_prompt = BEHAVIOUR_PROMPTS[behaviour]['negative']
+                positive_prompt = BEHAVIOUR_PROMPTS[prompts_key]['positive']
+                negative_prompt = BEHAVIOUR_PROMPTS[prompts_key]['negative']
             elif direct_or_incentivised == "incentivised":
-                positive_prompt = BEHAVIOUR_PROMPTS[behaviour]['positive_incentive']
-                negative_prompt = BEHAVIOUR_PROMPTS[behaviour]['negative_incentive']
+                positive_prompt = BEHAVIOUR_PROMPTS[prompts_key]['positive_incentive']
+                negative_prompt = BEHAVIOUR_PROMPTS[prompts_key]['negative_incentive']
             modified_human_list = [f"{positive_prompt if (i // 3) % 2 == 0 else negative_prompt} {human}" for i, human in enumerate(human_list)]
         else:
-            prompt = BEHAVIOUR_PROMPTS[behaviour][prompt_type]
+            prompt = BEHAVIOUR_PROMPTS[prompts_key][prompt_type]
             modified_human_list = [f"{prompt} {human}" for i, human in enumerate(human_list)]
         df = pd.DataFrame(
             {

@@ -53,6 +53,12 @@ def main():
         help="Name of the behaviour bucket; outputs saved under datasets/<behaviour>/",
     )
     parser.add_argument(
+        "--datasource",
+        type=str,
+        default="ultrachat",
+        help="Name of the datasource",
+    )
+    parser.add_argument(
         "--add-prompt",
         type=str,
         default="no",
@@ -91,6 +97,7 @@ def main():
         output_file="temp_outputs",
         batch_size=args.batch_size,
         behaviour=args.behaviour,
+        datasource=args.datasource,
         sample=args.sample,
         add_prompt=yes_no_str(args.add_prompt),
         prompt_type=args.prompt_type,

@@ -177,6 +177,7 @@ def generate_and_save_balanced_dataset(behaviour, datasource, prompt_dataset, re
             output_file="data/temp/responses_latest.jsonl",
             batch_size=200,
             behaviour=behaviour, 
+            datasource=datasource,
             sample=0,
             add_prompt=generation_method == "prompted" or generation_method == "incentivised",
             prompt_type="alternating",
