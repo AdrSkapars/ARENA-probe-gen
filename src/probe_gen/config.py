@@ -56,19 +56,19 @@ class ConfigDict(dict):
 
 ACTIVATION_DATASETS = {
     # Deception - Roleplay (train 3k, test 500)
-    "deception_rp_mistral_7b_3k": {
+    "deception_rp_llama_3b_prompted_3k": {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
-        "activations_filename_prefix": "mistral_7b_balanced_3k_layer_",
-        "labels_filename": data.deception_rp / "mistral_7b_balanced_3k.jsonl",
+        "activations_filename_prefix": "llama_3b_prompted_balanced_3k_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_3k.jsonl",
     },
     "deception_rp_llama_3b_500": {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
         "activations_filename_prefix": "llama_3b_balanced_500_layer_",
         "labels_filename": data.deception_rp / "llama_3b_balanced_500.jsonl",
     },
-    "deception_rp_mistral_7b_500": {
+    "deception_rp_llama_3b_prompted_500": {
         "repo_id": "lasrprobegen/roleplay-deception-activations",
-        "activations_filename_prefix": "mistral_7b_balanced_500_layer_",
-        "labels_filename": data.deception_rp / "mistral_7b_balanced_500.jsonl",
-    }
+        "activations_filename_prefix": "llama_3b_prompted_balanced_500_layer_",
+        "labels_filename": data.deception_rp / "llama_3b_prompted_balanced_500.jsonl",
+    },
 }
