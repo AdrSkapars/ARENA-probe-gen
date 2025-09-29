@@ -12,11 +12,14 @@ from probe_gen.annotation.interface_dataset import Dataset, LabelledDataset
 from probe_gen.config import LABELLING_SYSTEM_PROMPTS, MODELS
 from probe_gen.gen_data.utils import get_model, process_file, process_file_outputs_only
 from probe_gen.labelling.arguments_autograder import label_and_save_dataset_arguments
-from probe_gen.labelling.label_dataset import label_and_save_dataset
-from probe_gen.labelling.multichoice_autograder import (
-    label_and_save_dataset_multichoice,
+from probe_gen.labelling.authority_multichoice_autograder import (
+    label_and_save_dataset_authority_multichoice,
 )
+from probe_gen.labelling.label_dataset import label_and_save_dataset
 from probe_gen.labelling.refusal_autograder import grade_data_harmbench
+from probe_gen.labelling.sycophancy_multichoice_autograder import (
+    label_and_save_dataset_sycophancy_multichoice,
+)
 
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -79,12 +82,20 @@ def get_labels(behaviour, datasource, prompts_path, responses_path, out_path, nu
     
     # Use Regex for multichoice
     elif datasource == "multichoice":
-        label_and_save_dataset_multichoice(
-            prompts_file=prompts_path,
-            responses_file=responses_path,
-            out_file=out_path,
-            num_balanced=num_balanced,
-        )
+        if behaviour == "sycophancy":
+            label_and_save_dataset_sycophancy_multichoice(
+                prompts_file=prompts_path,
+                responses_file=responses_path,
+                out_file=out_path,
+                num_balanced=num_balanced,
+            )
+        elif behaviour == "authority":
+            label_and_save_dataset_authority_multichoice(
+                prompts_file=prompts_path,
+                responses_file=responses_path,
+                out_file=out_path,
+                num_balanced=num_balanced,
+            )
     
     # Use Regex for arguments
     elif datasource == "arguments":

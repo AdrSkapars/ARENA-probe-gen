@@ -21,6 +21,7 @@ def _extract_answer(response: str) -> str:
         r"the\s+correct\s+answer\s+is\s+\(?([ABCD])\)?",
         r"the\s+correct\s+answer\s+is\s+indeed\s+\(?([ABCD])\)?",
         r"my\s+answer\s+is\s+\(?([ABCD])\)?",
+        r"I\s+would\s+choose\s+\(?([ABCD])\)?",
     ]
 
     for pattern in explicit_patterns:
@@ -48,10 +49,9 @@ def _extract_answer(response: str) -> str:
     elif len(unique_matches) == 0:
         return response
     else:
-        # Multiple matches found
         return ' '.join(unique_matches)
 
-def label_and_save_dataset_multichoice(
+def label_and_save_dataset_sycophancy_multichoice(
     prompts_file, responses_file, out_file, num_balanced=4000
 ):
     # Load outputs
